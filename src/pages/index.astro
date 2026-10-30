@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import Abertura from '../components/home/Abertura.astro';
+import Procura from '../components/home/Procura.astro';
+import Manifesto from '../components/home/Manifesto.astro';
+import Antes from '../components/home/Antes.astro';
+import Quem from '../components/home/Quem.astro';
+import ConsultaHorizontal from '../components/home/ConsultaHorizontal.astro';
+import Leituras from '../components/home/Leituras.astro';
+import Praticas from '../components/home/Praticas.astro';
+import Encerramento from '../components/home/Encerramento.astro';
+import Marquee from '../components/fx/Marquee.astro';
+import { profissional as p } from '../data/profissional';
+
+// Dados estruturados correspondentes ao que está visível na página.
+// O local de atendimento entra quando o endereço for confirmado, sem
+// classificar o Espaço Arthemi como clínica médica.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'IndividualPhysician',
+  name: p.nome,
+  description: `${p.especialidade} em ${p.cidade}.`,
+  url: Astro.site?.href,
+  knowsAbout: ['Acupuntura', 'Enxaqueca', 'Dor cervical'],
+  sameAs: [p.instagram],
+  hasCredential: [
+    { '@type': 'EducationalOccupationalCredential', credentialCategory: 'Registro no Conselho Regional de Medicina', identifier: p.crm },
+    { '@type': 'EducationalOccupationalCredential', credentialCategory: `Registro de Qualificação de Especialista em ${p.areaRqe}`, identifier: p.rqe },
+  ],
+  ...(p.local.confirmado
+    ? {
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: p.local.endereco,
+          addressLocality: p.cidade,
+          addressRegion: p.uf,
+          postalCode: p.local.cep,
+          addressCountry: 'BR',
+        },
+      }
+    : {}),
+};
+---
+<Base
+  titulo="Dra. Thaís Santos | Médica especialista em Acupuntura em Belo Horizonte"
+  descricao="Acupuntura médica em Belo Horizonte com a Dra. Thaís Santos (CRM-MG 80240, RQE 60876). Avaliação antes de qualquer agulha, artigos com fontes e como solicitar uma consulta."
+  jsonLd={jsonLd}
+  intro
+>
+  <Abertura />
+  <Marquee itens={['Avaliação antes da agulha', 'Acupuntura médica', 'Raciocínio clínico', 'Belo Horizonte', 'Fontes em cada artigo']} />
+  <Procura />
+  <Manifesto />
+  <Antes />
+  <Quem />
+  <ConsultaHorizontal />
+  <Leituras />
+  <Praticas />
+  <Encerramento />
+</Base>

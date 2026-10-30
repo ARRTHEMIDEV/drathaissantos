@@ -1,0 +1,137 @@
+---
+import Icone from '../Icone.astro';
+import Seta from '../Seta.astro';
+import Pendente from '../Pendente.astro';
+import Faiscas from '../fx/Faiscas.astro';
+import { profissional as p } from '../../data/profissional';
+---
+<section class="encerramento sobre-verde" aria-labelledby="titulo-encerramento" data-cta-final>
+  <Faiscas tom="claro" densidade={0.9} />
+  <div class="envoltorio grade encerramento__grade">
+    <Icone nome="faiscas-cinco" class="encerramento__faiscas" />
+    <h2 class="display encerramento__titulo" id="titulo-encerramento" data-revelar="linhas">Para marcar a primeira consulta</h2>
+    <div class="encerramento__texto" data-revelar="subir" data-revelar-filhos>
+      <p class="lead">
+        Envie uma mensagem pelo WhatsApp do consultório. A equipe responde com os horários disponíveis e tira suas dúvidas sobre o atendimento.
+      </p>
+      <a class="encerramento__botao" href="/agendar" data-magnetico="0.35">
+        <span class="encerramento__botao-texto">Solicitar agendamento</span>
+        <span class="encerramento__botao-icone" aria-hidden="true"><Seta /></span>
+      </a>
+    </div>
+    <div class="encerramento__local auxiliar" data-revelar="subir">
+      <p>
+        {p.local.nome}, {p.local.confirmado ? `${p.local.endereco}, ${p.local.bairro}` : <Pendente motivo="confirmar endereço">{p.local.endereco}, {p.local.bairro}</Pendente>}, {p.cidade}
+      </p>
+      <p>{p.nome}, médica, {p.crm}, {p.rqe}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .encerramento {
+    position: relative;
+    overflow: clip;
+    padding-block: calc(var(--secao) * 1.2) calc(var(--secao) * 0.8);
+  }
+
+  .encerramento__grade {
+    position: relative;
+    row-gap: 2.25rem;
+  }
+
+  .encerramento :global(.encerramento__faiscas) {
+    grid-column: 1 / -1;
+    width: 9rem;
+    color: var(--caramelo);
+  }
+
+  .encerramento__titulo {
+    grid-column: 1 / -1;
+    font-size: clamp(2.75rem, 1.2rem + 6vw, 8rem);
+    line-height: 0.95;
+  }
+
+  .encerramento__texto {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 2rem;
+    justify-items: start;
+    max-width: 38rem;
+  }
+
+  .encerramento__botao {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.6rem 0.6rem 0.6rem 2rem;
+    border-radius: 999px;
+    background: var(--sobre-verde);
+    color: var(--verde);
+    font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+    font-weight: 650;
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .encerramento__botao::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--caramelo);
+    clip-path: circle(0% at 90% 50%);
+    transition: clip-path 0.7s var(--curva-entrada);
+  }
+
+  .encerramento__botao:hover::before,
+  .encerramento__botao:focus-visible::before {
+    clip-path: circle(150% at 90% 50%);
+  }
+
+  .encerramento__botao:hover {
+    color: var(--branco);
+  }
+
+  .encerramento__botao-icone {
+    display: grid;
+    place-items: center;
+    width: clamp(3.25rem, 2.8rem + 1.5vw, 4.25rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--verde);
+    color: var(--sobre-verde);
+    transition: rotate 0.6s var(--curva-entrada);
+  }
+
+  .encerramento__botao:hover .encerramento__botao-icone {
+    rotate: -45deg;
+  }
+
+  .encerramento__botao-icone :global(.seta) {
+    width: 1.35rem;
+  }
+
+  .encerramento__local {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--linha-sobre-verde);
+  }
+
+  @media (min-width: 64rem) {
+    .encerramento__titulo {
+      grid-column: 1 / span 10;
+    }
+    .encerramento__texto {
+      grid-column: 1 / span 6;
+    }
+    .encerramento__local {
+      grid-column: 8 / span 5;
+      align-self: end;
+    }
+  }
+</style>

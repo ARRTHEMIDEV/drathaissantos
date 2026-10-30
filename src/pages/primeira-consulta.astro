@@ -1,0 +1,430 @@
+---
+import Base from '../layouts/Base.astro';
+import Foto from '../components/Foto.astro';
+import Icone from '../components/Icone.astro';
+import Pendente from '../components/Pendente.astro';
+import Encerramento from '../components/home/Encerramento.astro';
+import { etapasConsulta } from '../data/consulta';
+---
+<Base
+  titulo="Como funciona a primeira consulta"
+  descricao="O que acontece na primeira consulta de acupuntura médica com a Dra. Thaís Santos em Belo Horizonte: conversa, exame, plano e, quando indicada, a sessão."
+>
+  <header class="envoltorio grade consulta-topo">
+    <div class="consulta-topo__texto">
+      <h1 class="display consulta-topo__titulo" data-revelar="linhas">Como funciona a primeira consulta</h1>
+      <p class="lead" data-revelar="subir" data-atraso="0.3">
+        Antes de qualquer agulha, a consulta serve para entender a sua dor e decidir, junto com você, o que faz sentido.
+      </p>
+      <p class="auxiliar"><Pendente motivo="etapas e textos a confirmar com a rotina real do consultório" /></p>
+    </div>
+    <nav class="consulta-topo__capitulos" aria-label="Etapas da consulta" data-revelar="subir" data-atraso="0.4">
+      <p class="consulta-topo__rotulo">Em resumo</p>
+      <ol>
+        {etapasConsulta.map((etapa, i) => (
+          <li>
+            <a href={`#etapa-${etapa.id}`}>
+              <span class="consulta-topo__numero" aria-hidden="true">{i + 1}</span>
+              <span>
+                <strong>{etapa.titulo}</strong>
+                <span class="auxiliar">{etapa.resumo}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </header>
+
+  <section class="cenas" aria-label="A consulta, etapa por etapa" data-cenas>
+    <div class="envoltorio grade cenas__grade">
+      <div class="cenas__quadro" aria-hidden="true">
+        <div class="cenas__fotos">
+          {etapasConsulta.map((etapa, i) => (
+            <div class="cenas__foto" data-cena-foto={i} data-ativa={i === 0 ? 'true' : 'false'}>
+              <Foto foto={etapa.foto} alt="" proporcao="4 / 5" sizes="(min-width: 64rem) 55vw, 1px" />
+            </div>
+          ))}
+        </div>
+        <span class="cenas__numero-grande" aria-hidden="true"><span data-numero-grande>01</span></span>
+        <p class="cenas__legenda auxiliar" data-cena-legenda>{etapasConsulta[0].legenda}</p>
+      </div>
+
+      <div class="cenas__coluna" data-capitulos>
+        <span class="cenas__trilho" aria-hidden="true">
+          <Icone nome="faisca" class="cenas__marcador" />
+        </span>
+        <ol class="cenas__capitulos">
+        {etapasConsulta.map((etapa, i) => (
+          <li class="cenas__capitulo" id={`etapa-${etapa.id}`} data-capitulo={i} data-legenda={etapa.legenda} data-ativo={i === 0 ? 'true' : 'false'}>
+            <figure class="cenas__foto-celular">
+              <Foto foto={etapa.foto} proporcao="4 / 5" proporcaoCelular="4 / 3" sizes="(max-width: 63.99rem) 100vw, 1px" />
+              <figcaption class="auxiliar">{etapa.legenda}</figcaption>
+            </figure>
+            <p class="cenas__numero" aria-hidden="true">{i + 1}</p>
+            <h2 class="cenas__titulo">{etapa.titulo}</h2>
+            {etapa.texto.map((paragrafo) => <p>{paragrafo}</p>)}
+          </li>
+        ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="envoltorio grade consulta-preparo secao" aria-labelledby="titulo-preparo">
+    <h2 class="display consulta-preparo__titulo" id="titulo-preparo">Para aproveitar melhor a consulta</h2>
+    <div class="consulta-preparo__texto">
+      <p class="lead">
+        Algumas anotações ajudam a conversa a render mais do que a lembrança da última crise.
+      </p>
+      <ul class="consulta-preparo__lista">
+        <li>Desde quando a dor aparece e com que frequência.</li>
+        <li>O que piora, o que alivia e o que você já tentou.</li>
+        <li>Remédios que usa, inclusive os da crise, e exames que já fez.</li>
+        <li>O que a dor tem impedido você de fazer.</li>
+      </ul>
+      <p class="auxiliar"><Pendente motivo="lista a aprovar pela Dra. Thaís" /></p>
+    </div>
+  </section>
+
+  <Encerramento />
+</Base>
+
+<script>
+  import { gsap } from 'gsap';
+  // Acompanhar: o capítulo no centro da tela define a foto, a legenda e a
+  // posição da faísca. A faixa central evita tremulação entre dois capítulos.
+  const cenas = document.querySelector<HTMLElement>('[data-cenas]');
+  if (cenas) {
+    const capitulos = [...cenas.querySelectorAll<HTMLElement>('[data-capitulo]')];
+    const fotos = [...cenas.querySelectorAll<HTMLElement>('[data-cena-foto]')];
+    const legenda = cenas.querySelector<HTMLElement>('[data-cena-legenda]');
+    const lista = cenas.querySelector<HTMLElement>('[data-capitulos]');
+
+    const numero = cenas.querySelector<HTMLElement>('[data-numero-grande]');
+    const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let atualIndice = -1;
+    let camada = 2;
+    // As fotos que ainda não apareceram começam fechadas; as já vistas ficam
+    // abertas embaixo, e cada nova sobe por cima da anterior.
+    fotos.forEach((f, i) => {
+      f.style.zIndex = i === 0 ? '2' : '1';
+      if (i > 0) f.style.clipPath = 'inset(100% 0% 0% 0%)';
+    });
+
+    // Acompanhar + abrir: a nova foto sobe como cortina por cima da anterior,
+    // o número grande troca e a faísca desliza até o capítulo.
+    const ativar = (indice: number) => {
+      if (indice === atualIndice) return;
+      const subindo = indice > atualIndice;
+      atualIndice = indice;
+      capitulos.forEach((c, i) => (c.dataset.ativo = String(i === indice)));
+      fotos.forEach((f, i) => (f.dataset.ativa = String(i === indice)));
+      const foto = fotos[indice];
+      if (foto && reduzido) {
+        foto.style.zIndex = String(++camada);
+        foto.style.clipPath = 'none';
+      } else if (foto && atualIndice >= 0) {
+        foto.style.zIndex = String(++camada);
+        gsap.fromTo(
+          foto,
+          { clipPath: subindo ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.05, ease: 'expo.inOut', overwrite: true },
+        );
+        const img = foto.querySelector('img');
+        if (img) gsap.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 1.6, ease: 'expo.out', overwrite: true });
+      }
+      if (numero && !reduzido) {
+        gsap.timeline()
+          .to(numero, { yPercent: subindo ? -110 : 110, duration: 0.35, ease: 'power3.in' })
+          .add(() => (numero.textContent = String(indice + 1).padStart(2, '0')))
+          .fromTo(numero, { yPercent: subindo ? 110 : -110 }, { yPercent: 0, duration: 0.6, ease: 'expo.out' });
+      } else if (numero) numero.textContent = String(indice + 1).padStart(2, '0');
+      const atual = capitulos[indice];
+      if (legenda && atual) legenda.textContent = atual.dataset.legenda ?? '';
+      if (lista && atual) lista.style.setProperty('--marcador-y', `${atual.offsetTop}px`);
+    };
+
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) ativar(Number((e.target as HTMLElement).dataset.capitulo));
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    capitulos.forEach((c) => observador.observe(c));
+    ativar(0);
+  }
+</script>
+
+<style>
+  .consulta-topo {
+    row-gap: 2.5rem;
+    padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+
+  .consulta-topo__texto {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .consulta-topo__titulo {
+    font-size: clamp(2.5rem, 1.2rem + 4.8vw, 6rem);
+    max-width: 12ch;
+  }
+
+  .consulta-topo__capitulos {
+    grid-column: 1 / -1;
+  }
+
+  .consulta-topo__rotulo {
+    font-size: var(--t-pequeno);
+    font-weight: 650;
+    color: var(--tinta-suave);
+    margin-bottom: 0.75rem;
+  }
+
+  .consulta-topo__capitulos ol {
+    display: grid;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--linha-forte);
+  }
+
+  .consulta-topo__capitulos a {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--linha);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .consulta-topo__capitulos a strong {
+    display: block;
+    font-weight: 640;
+    color: var(--verde);
+  }
+
+  .consulta-topo__capitulos a:hover strong {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .consulta-topo__numero {
+    font-family: var(--fonte-display);
+    font-size: 1.6rem;
+    line-height: 1.1;
+    color: var(--caramelo);
+  }
+
+  /* ---------- Cenas ---------- */
+
+  .cenas__quadro {
+    display: none;
+  }
+
+  .cenas__coluna {
+    position: relative;
+    grid-column: 1 / -1;
+  }
+
+  .cenas__capitulos {
+    display: grid;
+    gap: 3.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cenas__trilho {
+    display: none;
+  }
+
+  .cenas__capitulo {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+    scroll-margin-top: 2rem;
+  }
+
+  .cenas__capitulo p:not(.cenas__numero) {
+    max-width: 34rem;
+  }
+
+  .cenas__foto-celular {
+    display: grid;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cenas__foto-celular :global(.foto) {
+    border-radius: var(--raio);
+  }
+
+  .cenas__numero {
+    font-family: var(--fonte-display);
+    font-size: 2.25rem;
+    line-height: 1;
+    color: var(--caramelo);
+  }
+
+  .cenas__titulo {
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+    font-weight: 640;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--verde);
+  }
+
+  @media (min-width: 64rem) {
+    .consulta-topo__texto {
+      grid-column: 1 / span 7;
+    }
+
+    .consulta-topo__capitulos {
+      grid-column: 9 / span 4;
+      align-self: end;
+    }
+
+    .cenas__quadro {
+      display: grid;
+      gap: 0.75rem;
+      grid-column: 1 / span 7;
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+    }
+
+    .cenas__fotos {
+      display: grid;
+      height: min(calc(100svh - 6rem), 52rem);
+      overflow: hidden;
+      border-radius: var(--raio);
+      background: #d9cfc2;
+    }
+
+    .cenas__foto {
+      grid-area: 1 / 1;
+      overflow: hidden;
+    }
+
+    /* Sem JavaScript, só a primeira foto aparece no quadro. */
+    :global(html:not(.js)) .cenas__foto:not(:first-child) {
+      visibility: hidden;
+    }
+
+    .cenas__numero-grande {
+      position: absolute;
+      right: 1.25rem;
+      top: 1rem;
+      z-index: 20;
+      overflow: hidden;
+      font-family: var(--fonte-display);
+      font-size: clamp(5rem, 3rem + 6vw, 10rem);
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--sobre-verde);
+      pointer-events: none;
+    }
+
+    .cenas__numero-grande span {
+      display: block;
+    }
+
+    .cenas__foto :global(.foto) {
+      height: 100%;
+      aspect-ratio: auto;
+    }
+
+    .cenas__coluna {
+      grid-column: 9 / span 4;
+      padding-left: 2.25rem;
+    }
+
+    .cenas__capitulos {
+      gap: 0;
+    }
+
+    .cenas__trilho {
+      display: block;
+      position: absolute;
+      left: 0.45rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--linha-forte);
+    }
+
+    .cenas__trilho :global(.cenas__marcador) {
+      position: absolute;
+      left: -0.45rem;
+      top: 0;
+      width: 0.9rem;
+      color: var(--caramelo);
+      translate: 0 calc(var(--marcador-y, 0px) + 0.6rem);
+      transition: translate var(--d-marcador) var(--curva-saida);
+    }
+
+    .cenas__capitulo {
+      min-height: 46svh;
+      padding-block: 0 4rem;
+      transition: opacity var(--d-foto) var(--curva-saida);
+    }
+
+    :global(.js) .cenas__capitulo {
+      opacity: 0.45;
+    }
+
+    .cenas__capitulo:last-child {
+      min-height: 0;
+    }
+
+    :global(.js) .cenas__capitulo[data-ativo='true'] {
+      opacity: 1;
+    }
+
+    .cenas__foto-celular {
+      display: none;
+    }
+  }
+
+  /* ---------- Preparo ---------- */
+
+  .consulta-preparo {
+    row-gap: 2rem;
+  }
+
+  .consulta-preparo__titulo {
+    grid-column: 1 / -1;
+  }
+
+  .consulta-preparo__texto {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    max-width: 40rem;
+  }
+
+  .consulta-preparo__lista {
+    display: grid;
+    gap: 0.6rem;
+    padding-left: 1.2rem;
+  }
+
+  .consulta-preparo__lista li::marker {
+    color: var(--caramelo);
+  }
+
+  @media (min-width: 64rem) {
+    .consulta-preparo__titulo {
+      grid-column: 1 / span 5;
+    }
+    .consulta-preparo__texto {
+      grid-column: 7 / span 6;
+    }
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+// Selo giratório com a identificação profissional ao redor de uma faísca.
+// Reforça CRM e RQE como detalhe gráfico; o texto também é lido por leitor de tela.
+import Icone from '../Icone.astro';
+import { profissional as p } from '../../data/profissional';
+
+interface Props {
+  class?: string;
+  tom?: 'verde' | 'claro';
+}
+const { class: classe, tom = 'verde' } = Astro.props;
+const texto = `Médica ✦ ${p.crm} ✦ ${p.rqe} ✦ ${p.areaRqe} ✦ `;
+const id = `selo-${Math.random().toString(36).slice(2, 8)}`;
+---
+<div class:list={['selo', `selo--${tom}`, classe]} role="img" aria-label={`${p.nome}, médica, ${p.crm}, ${p.rqe}, ${p.areaRqe}`}>
+  <svg class="selo__texto" viewBox="0 0 200 200" aria-hidden="true">
+    <defs>
+      <path id={id} d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+    </defs>
+    <text>
+      <textPath href={`#${id}`} textLength="488" lengthAdjust="spacing">{texto.toUpperCase()}</textPath>
+    </text>
+  </svg>
+  <span class="selo__centro"><Icone nome="faisca" /></span>
+</div>
+
+<style>
+  .selo {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 8.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+
+  .selo--verde {
+    background: var(--verde);
+    color: var(--sobre-verde);
+  }
+
+  .selo--claro {
+    background: var(--papel-claro);
+    color: var(--verde);
+    box-shadow: 0 0 0 1px var(--linha);
+  }
+
+  .selo__texto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: girar 28s linear infinite;
+  }
+
+  .selo__texto text {
+    font-family: var(--fonte-texto);
+    font-size: 13.5px;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    fill: currentColor;
+  }
+
+  .selo__centro {
+    width: 26%;
+    color: var(--caramelo);
+  }
+
+  @keyframes girar {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .selo__texto {
+      animation: none;
+    }
+  }
+</style>

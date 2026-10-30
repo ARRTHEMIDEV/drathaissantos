@@ -1,0 +1,99 @@
+---
+// Fotografia com recorte próprio para celular e desktop, AVIF/WebP responsivo,
+// ponto focal por uso e espaço reservado antes do carregamento.
+import { getImage } from 'astro:assets';
+import type { Foto } from '../data/fotos';
+
+interface Props {
+  foto: Foto;
+  /** Foto diferente para celular (recorte próprio). */
+  fotoCelular?: Foto;
+  /** Proporção no desktop e no celular, ex.: '4 / 5'. */
+  proporcao?: string;
+  proporcaoCelular?: string;
+  sizes?: string;
+  prioridade?: boolean;
+  class?: string;
+  /** Nome de view transition (deve ser único na página). */
+  transicao?: string;
+  /** Usa o alt da foto; passe '' para imagem decorativa. */
+  alt?: string;
+}
+
+const {
+  foto,
+  fotoCelular,
+  proporcao = '4 / 5',
+  proporcaoCelular,
+  sizes = '(min-width: 48rem) 50vw, 100vw',
+  prioridade = false,
+  class: classe,
+  transicao,
+  alt,
+} = Astro.props;
+
+const larguras = [480, 720, 960, 1280, 1680, 2160];
+const celular = fotoCelular ?? foto;
+
+async function conjunto(f: Foto, formato: 'avif' | 'webp') {
+  const w = larguras.filter((l) => l <= f.src.width);
+  const img = await getImage({ src: f.src, widths: w, format: formato, quality: formato === 'avif' ? 62 : 74 });
+  return img.srcSet.attribute;
+}
+
+const [dAvif, dWebp, cAvif, cWebp] = await Promise.all([
+  conjunto(foto, 'avif'),
+  conjunto(foto, 'webp'),
+  conjunto(celular, 'avif'),
+  conjunto(celular, 'webp'),
+]);
+const reserva = await getImage({ src: foto.src, width: 1280, format: 'jpg', quality: 78 });
+const textoAlt = alt ?? foto.alt;
+const estilo = [
+  `--proporcao:${proporcao}`,
+  `--proporcao-celular:${proporcaoCelular ?? proporcao}`,
+  `--foco-d:${foto.foco.desktop}`,
+  `--foco-c:${celular.foco.celular}`,
+  transicao ? `view-transition-name:${transicao}` : '',
+].filter(Boolean).join(';');
+---
+<picture class:list={['foto', classe]} style={estilo}>
+  <source media="(max-width: 47.99rem)" type="image/avif" srcset={cAvif} sizes={sizes} />
+  <source media="(max-width: 47.99rem)" type="image/webp" srcset={cWebp} sizes={sizes} />
+  <source type="image/avif" srcset={dAvif} sizes={sizes} />
+  <source type="image/webp" srcset={dWebp} sizes={sizes} />
+  <img
+    src={reserva.src}
+    width={foto.src.width}
+    height={foto.src.height}
+    alt={textoAlt}
+    loading={prioridade ? 'eager' : 'lazy'}
+    decoding={prioridade ? 'sync' : 'async'}
+    fetchpriority={prioridade ? 'high' : 'auto'}
+  />
+</picture>
+
+<style>
+  .foto {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: var(--proporcao-celular);
+    background: #d9cfc2;
+  }
+
+  .foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--foco-c);
+  }
+
+  @media (min-width: 48rem) {
+    .foto {
+      aspect-ratio: var(--proporcao);
+    }
+    .foto img {
+      object-position: var(--foco-d);
+    }
+  }
+</style>

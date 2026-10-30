@@ -1,0 +1,10 @@
+---
+// Marca uma informação ainda não confirmada. Aparece destacada nos previews
+// e faz o build de produção falhar (scripts/verificar-publicacao.mjs).
+interface Props {
+  motivo: string;
+}
+const { motivo } = Astro.props;
+const temConteudo = Astro.slots.has('default');
+---
+<mark class="pendente" data-pendente={motivo}>{temConteudo && <slot />}<span class="pendente__motivo">{temConteudo ? ' ' : ''}[pendente: {motivo}]</span></mark>

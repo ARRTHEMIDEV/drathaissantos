@@ -1,0 +1,215 @@
+---
+import Icone from './Icone.astro';
+import Pendente from './Pendente.astro';
+import { profissional as p } from '../data/profissional';
+const ano = new Date().getFullYear();
+---
+<footer class="rodape sobre-verde" data-rodape>
+  <div class="envoltorio grade rodape__grade">
+    <div class="rodape__marca">
+      <Icone nome="faiscas-cinco" class="rodape__faiscas" />
+      <p class="rodape__frase">Antes de qualquer agulha, vem a avaliação.</p>
+    </div>
+
+    <div class="rodape__bloco">
+      <h2 class="rodape__titulo">Identificação profissional</h2>
+      <p>
+        {p.nome}<br />
+        Médica, {p.crm}<br />
+        {p.areaRqe}, {p.rqe}
+      </p>
+      <a class="link rodape__cfm" href={p.buscaCfm} rel="noopener" target="_blank">Consultar registro no CFM</a>
+    </div>
+
+    <div class="rodape__bloco">
+      <h2 class="rodape__titulo">Onde atende</h2>
+      <p>
+        {p.local.nome}<br />
+        {p.local.confirmado ? (
+          <>{p.local.endereco}, {p.local.bairro}</>
+        ) : (
+          <Pendente motivo="confirmar endereço">{p.local.endereco}, {p.local.bairro}</Pendente>
+        )}<br />
+        {p.cidade}, {p.uf}
+      </p>
+      <a class="link" href={p.local.site} rel="noopener" target="_blank">Site do Espaço Arthemi</a>
+    </div>
+
+    <div class="rodape__bloco">
+      <h2 class="rodape__titulo">Contato</h2>
+      <ul class="rodape__lista">
+        <li><a class="link" href="/agendar">Solicitar agendamento</a></li>
+        <li><a class="link" href={p.instagram} rel="noopener" target="_blank">Instagram {p.instagramUsuario}</a></li>
+        <li><a class="link" href="/privacidade">Privacidade</a></li>
+      </ul>
+    </div>
+
+    <div class="rodape__base">
+      <p class="auxiliar">
+        O conteúdo deste site é informativo e não substitui a avaliação médica individual. © {ano} {p.nome}.
+      </p>
+      <button type="button" class="rodape__topo" data-topo>
+        <span>Voltar ao topo</span>
+        <span class="rodape__topo-icone" aria-hidden="true"><Icone nome="leque" /></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="rodape__gigante" aria-hidden="true">
+    <span class="rodape__gigante-logo" data-logo-gigante><Icone nome="nome-horizontal" /></span>
+  </div>
+</footer>
+
+<script>
+  import { gsap, reduzido } from '../scripts/movimento';
+
+  document.querySelector('[data-topo]')?.addEventListener('click', () => {
+    if (window.__lenis) window.__lenis.scrollTo(0, { duration: 1.8 });
+    else window.scrollTo({ top: 0, behavior: reduzido ? 'auto' : 'smooth' });
+    (document.querySelector('#conteudo') as HTMLElement | null)?.focus({ preventScroll: true });
+  });
+
+  const logo = document.querySelector('[data-logo-gigante]');
+  const rodape = document.querySelector('[data-rodape]');
+  if (logo && rodape && !reduzido) {
+    gsap.fromTo(
+      logo,
+      { yPercent: 70, scale: 0.92 },
+      { yPercent: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: rodape, start: 'top 85%', end: 'bottom bottom', scrub: true } },
+    );
+  }
+</script>
+
+<style>
+  .rodape {
+    position: relative;
+    overflow: hidden;
+    padding-top: clamp(4rem, 2rem + 5vw, 7rem);
+    font-size: var(--t-pequeno);
+  }
+
+  .rodape__grade {
+    row-gap: 2.75rem;
+  }
+
+  .rodape__marca {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .rodape :global(.rodape__faiscas) {
+    width: 6.5rem;
+    color: var(--caramelo);
+  }
+
+  .rodape__frase {
+    font-family: var(--fonte-display);
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+    max-width: 16ch;
+  }
+
+  .rodape__bloco {
+    grid-column: 1 / -1;
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+  }
+
+  .rodape__titulo {
+    font-size: var(--t-pequeno);
+    font-weight: 650;
+    color: var(--sobre-verde-suave);
+  }
+
+  .rodape__lista {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .rodape__cfm {
+    justify-self: start;
+  }
+
+  .rodape__base {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--linha-sobre-verde);
+  }
+
+  .rodape__topo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--toque);
+    border: 0;
+    background: none;
+    color: var(--sobre-verde);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .rodape__topo-icone {
+    display: grid;
+    width: 1.6rem;
+    color: var(--caramelo);
+    transition: rotate 0.6s var(--curva-entrada), translate 0.6s var(--curva-entrada);
+  }
+
+  .rodape__topo:hover .rodape__topo-icone {
+    rotate: -20deg;
+    translate: 0 -4px;
+  }
+
+  .rodape__gigante {
+    margin-top: clamp(2.5rem, 1rem + 4vw, 5rem);
+    padding-inline: var(--margem);
+    line-height: 0;
+  }
+
+  .rodape__gigante-logo {
+    display: block;
+    color: var(--sobre-verde);
+    opacity: 0.95;
+    transform-origin: center bottom;
+    margin-bottom: -0.6vw;
+  }
+
+  @media (min-width: 48rem) {
+    .rodape__marca {
+      grid-column: 1 / span 4;
+    }
+    .rodape__bloco:nth-of-type(2) {
+      grid-column: 5 / span 3;
+    }
+    .rodape__bloco:nth-of-type(3) {
+      grid-column: 8 / span 3;
+    }
+    .rodape__bloco:nth-of-type(4) {
+      grid-column: 11 / span 2;
+    }
+  }
+
+  @media (min-width: 48rem) and (max-width: 63.99rem) {
+    .rodape__marca {
+      grid-column: 1 / -1;
+    }
+    .rodape__bloco:nth-of-type(2) {
+      grid-column: 1 / span 4;
+    }
+    .rodape__bloco:nth-of-type(3) {
+      grid-column: 5 / span 4;
+    }
+    .rodape__bloco:nth-of-type(4) {
+      grid-column: 9 / span 4;
+    }
+  }
+</style>

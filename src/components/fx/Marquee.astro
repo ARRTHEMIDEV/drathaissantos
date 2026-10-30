@@ -1,0 +1,75 @@
+---
+// Faixa rolante com faíscas entre as palavras. Acelera com a rolagem e inverte
+// quando a pessoa sobe a página. O texto é lido uma vez pelo leitor de tela.
+import Icone from '../Icone.astro';
+
+interface Props {
+  itens: string[];
+  tom?: 'verde' | 'papel';
+  segundos?: number;
+}
+const { itens, tom = 'verde', segundos = 32 } = Astro.props;
+const repeticao = [...itens, ...itens];
+---
+<div class:list={['marquee', `marquee--${tom}`]} data-marquee={segundos}>
+  <p class="visualmente-oculto">{itens.join('. ')}.</p>
+  <div class="marquee__trilho" data-marquee-trilho aria-hidden="true">
+    {[0, 1].map(() => (
+      <div class="marquee__grupo">
+        {repeticao.map((item) => (
+          <span class="marquee__item">
+            {item}
+            <Icone nome="faisca" class="marquee__faisca" />
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(1.1rem, 0.8rem + 1vw, 1.75rem);
+  }
+
+  .marquee--verde {
+    background: var(--verde);
+    color: var(--sobre-verde);
+  }
+
+  .marquee--papel {
+    color: var(--verde);
+    border-block: 1px solid var(--linha-forte);
+  }
+
+  .marquee__trilho {
+    display: flex;
+    width: max-content;
+  }
+
+  .marquee__grupo {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
+    padding-right: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
+    font-family: var(--fonte-display);
+    font-size: clamp(1.75rem, 1.1rem + 2.6vw, 3.6rem);
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .marquee__item :global(.marquee__faisca) {
+    width: clamp(0.9rem, 0.6rem + 0.9vw, 1.5rem);
+    color: var(--caramelo);
+  }
+
+  /* Sem JavaScript ou com movimento reduzido, a faixa fica parada. */
+</style>

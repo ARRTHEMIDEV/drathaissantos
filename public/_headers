@@ -1,0 +1,5 @@
+# Previews do Cloudflare Pages nunca são indexados.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+https://*.:project.pages.dev/*
+  X-Robots-Tag: noindex

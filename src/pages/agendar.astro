@@ -1,0 +1,37 @@
+---
+// Rota de contato: conta o clique no Web Analytics (visita a /agendar, sem
+// nenhuma condição clínica associada) e redireciona para o WhatsApp.
+// Em produção, o public/_redirects do Cloudflare faz o redirecionamento direto.
+import Base from '../layouts/Base.astro';
+import Pendente from '../components/Pendente.astro';
+import { profissional as p, urlWhatsapp } from '../data/profissional';
+
+const destino = urlWhatsapp();
+---
+<Base titulo="Solicitar agendamento" descricao="Abrir uma conversa no WhatsApp do consultório da Dra. Thaís Santos." semIndice>
+  {destino && <meta http-equiv="refresh" content={`0; url=${destino}`} slot="head" />}
+  <section class="envoltorio agendar">
+    <h1 class="display">Solicitar agendamento</h1>
+    {destino ? (
+      <>
+        <p class="lead">Abrindo o WhatsApp do consultório…</p>
+        <p>Se nada acontecer, <a class="link" href={destino}>abra a conversa por aqui</a>.</p>
+        <script is:inline define:vars={{ destino }}>location.replace(destino);</script>
+      </>
+    ) : (
+      <p class="lead"><Pendente motivo="número do WhatsApp do consultório" /></p>
+    )}
+    <p class="auxiliar">
+      A mensagem já vem escrita: “{p.mensagemWhatsapp}”. Abrir a conversa não confirma a consulta; a equipe responde com os horários disponíveis.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .agendar {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 44rem;
+    padding-block: var(--secao);
+  }
+</style>

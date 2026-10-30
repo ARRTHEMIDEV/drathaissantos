@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import Cabecalho from '../components/Cabecalho.astro';
+import Rodape from '../components/Rodape.astro';
+import BarraContato from '../components/BarraContato.astro';
+import Intro from '../components/fx/Intro.astro';
+import { modoPreview } from '../lib/modo';
+import { site } from '../data/site';
+
+interface Props {
+  titulo: string;
+  descricao: string;
+  /** Caminho absoluto de imagem de compartilhamento (1200×630). */
+  imagem?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  semIndice?: boolean;
+  /** Intro de marca na primeira visita da sessão. */
+  intro?: boolean;
+  tipo?: 'website' | 'article';
+}
+
+const { titulo, descricao, imagem, jsonLd, semIndice = false, tipo = 'website', intro = false } = Astro.props;
+const caminho = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/') || '/';
+const canonica = new URL(caminho, Astro.site);
+const ehInicio = ['/', '/index', '/index.html'].includes(Astro.url.pathname);
+const tituloCompleto = ehInicio ? titulo : `${titulo} | Dra. Thaís Santos`;
+const imagemAbsoluta = imagem ? new URL(imagem, Astro.site).href : undefined;
+const naoIndexar = semIndice || modoPreview;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descricao} />
+    <link rel="canonical" href={canonica} />
+    {naoIndexar && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#193425" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/moxa-bestine-provisoria.otf" as="font" type="font/otf" crossorigin />
+
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:type" content={tipo} />
+    <meta property="og:site_name" content="Dra. Thaís Santos" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:url" content={canonica} />
+    {imagemAbsoluta && <meta property="og:image" content={imagemAbsoluta} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <slot name="head" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <script is:inline>
+      // A abertura anima só na primeira visita da sessão; voltar no navegador
+      // ou recarregar não repete a sequência.
+      try {
+        const vista = sessionStorage.getItem('abertura-vista');
+        document.documentElement.dataset.abertura = vista ? 'vista' : 'nova';
+        sessionStorage.setItem('abertura-vista', '1');
+      } catch (e) {
+        document.documentElement.dataset.abertura = 'vista';
+      }
+      document.documentElement.classList.add('js');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('movimento');
+        setTimeout(function () {
+          if (!document.documentElement.classList.contains('movimento-pronto')) {
+            document.documentElement.classList.add('sem-movimento');
+          }
+        }, 4000);
+      }
+    </script>
+  </head>
+  <body>
+    {intro && <Intro />}
+    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+    <Cabecalho />
+    <main id="conteudo" tabindex="-1">
+      <slot />
+    </main>
+    <Rodape />
+    <BarraContato />
+    <script>
+      import '../scripts/movimento';
+    </script>
+    {!modoPreview && site.tokenWebAnalytics && (
+      <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: site.tokenWebAnalytics })}></script>
+    )}
+  </body>
+</html>
+
+<style>
+  .pular {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 10;
+    padding: 0.75rem 1rem;
+    background: var(--verde);
+    color: var(--sobre-verde);
+    font-weight: 600;
+    border-radius: var(--raio);
+  }
+  .pular:focus {
+    top: 1rem;
+  }
+</style>

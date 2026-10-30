@@ -1,0 +1,121 @@
+---
+import Base from '../../layouts/Base.astro';
+import Foto from '../../components/Foto.astro';
+import Seta from '../../components/Seta.astro';
+import { artigosVisiveis, estadoRevisao, nomesDosTemas } from '../../lib/artigos';
+import { modoPreview } from '../../lib/modo';
+
+const artigos = await artigosVisiveis();
+---
+<Base titulo="Artigos" descricao="Artigos da Dra. Thaís Santos sobre acupuntura médica, enxaqueca e dor, com fontes e revisão médica.">
+  <section class="envoltorio grade biblioteca secao">
+    <header class="biblioteca__cabeca">
+      <h1 class="display biblioteca__titulo">Artigos</h1>
+      <p class="lead">Respostas às dúvidas que aparecem no consultório e no Instagram, com as fontes ao lado de cada afirmação.</p>
+    </header>
+
+    <ol class="biblioteca__lista">
+      {artigos.map((artigo) => {
+        const estado = estadoRevisao(artigo);
+        return (
+          <li>
+            <a class="biblioteca__item" href={`/artigos/${artigo.id}`}>
+              <Foto
+                foto={{ src: artigo.data.capa, alt: '', foco: { desktop: artigo.data.capaFoco, celular: artigo.data.capaFoco } }}
+                proporcao="16 / 8"
+                proporcaoCelular="4 / 3"
+                sizes="(min-width: 64rem) 40vw, 100vw"
+                class="biblioteca__foto"
+                transicao={`capa-${artigo.id}`}
+              />
+              <span class="biblioteca__tema auxiliar">{nomesDosTemas[artigo.data.tema]}</span>
+              <span class="biblioteca__nome">{artigo.data.titulo}</span>
+              <span class="biblioteca__resumo auxiliar">{artigo.data.resumo}</span>
+              {modoPreview && !estado.publicavel && <span class="biblioteca__estado">{estado.motivo}</span>}
+              <span class="biblioteca__acao">Ler o artigo <Seta /></span>
+            </a>
+          </li>
+        );
+      })}
+    </ol>
+  </section>
+</Base>
+
+<style>
+  .biblioteca {
+    row-gap: 3rem;
+  }
+
+  .biblioteca__cabeca {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    max-width: 44rem;
+  }
+
+  .biblioteca__titulo {
+    font-size: clamp(2.5rem, 1.2rem + 4.8vw, 6rem);
+  }
+
+  .biblioteca__lista {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 3rem;
+  }
+
+  .biblioteca__item {
+    display: grid;
+    gap: 0.6rem;
+    color: inherit;
+    text-decoration: none;
+    max-width: 52rem;
+  }
+
+  .biblioteca__item :global(.biblioteca__foto) {
+    border-radius: var(--raio);
+    margin-bottom: 0.5rem;
+  }
+
+  .biblioteca__nome {
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+    font-weight: 620;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--verde);
+    text-wrap: balance;
+  }
+
+  .biblioteca__estado {
+    justify-self: start;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    background: rgb(174 125 84 / 0.2);
+    color: var(--caramelo-texto);
+    font-size: var(--t-auxiliar);
+    font-weight: 650;
+  }
+
+  .biblioteca__acao {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 620;
+    color: var(--verde);
+  }
+
+  .biblioteca__acao :global(.seta) {
+    width: 1.1rem;
+    transition: translate var(--d-foco) var(--curva-saida);
+  }
+
+  .biblioteca__item:hover :global(.seta),
+  .biblioteca__item:focus-visible :global(.seta) {
+    translate: 3px 0;
+  }
+
+  @media (min-width: 64rem) {
+    .biblioteca__lista {
+      grid-column: 1 / span 9;
+    }
+  }
+</style>

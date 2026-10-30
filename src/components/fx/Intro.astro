@@ -1,0 +1,117 @@
+---
+// Intro de marca: só na primeira visita da sessão e só com movimento permitido.
+// O logotipo Dra. Thaís Santos sobe linha a linha, as faíscas acendem e a
+// cortina verde sobe revelando a abertura. Clique ou Esc pulam.
+import Icone from '../Icone.astro';
+---
+<div class="intro" data-intro-tela aria-hidden="true">
+  <div class="intro__centro">
+    <span class="intro__logo"><Icone nome="nome-empilhado" /></span>
+    <span class="intro__faiscas"><Icone nome="faiscas-cinco" /></span>
+    <p class="intro__sub" data-intro-sub>Acupuntura médica em Belo Horizonte</p>
+  </div>
+  <button type="button" class="intro__pular" data-intro-pular tabindex="-1">Pular</button>
+</div>
+
+<script is:inline>
+  (function () {
+    var tela = document.querySelector('[data-intro-tela]');
+    var reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var nova = document.documentElement.dataset.abertura === 'nova';
+    if (!tela || reduzido || !nova) {
+      if (tela) tela.remove();
+      window.__introFim = Promise.resolve();
+      return;
+    }
+    document.documentElement.classList.add('intro-ativa');
+    window.__introFim = new Promise(function (resolve) {
+      window.__introResolver = resolve;
+    });
+    // Rede de segurança: nunca prender a pessoa atrás da intro.
+    setTimeout(function () {
+      if (window.__introResolver) window.__introResolver();
+      document.documentElement.classList.remove('intro-ativa');
+      if (tela.isConnected) tela.remove();
+    }, 6000);
+  })();
+</script>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const tela = document.querySelector<HTMLElement>('[data-intro-tela]');
+  if (tela) {
+    const encerrar = () => {
+      document.documentElement.classList.remove('intro-ativa');
+      window.__lenis?.start();
+      tela.remove();
+    };
+    window.__lenis?.stop();
+    const tl = gsap.timeline({ delay: 0.15, onComplete: encerrar });
+    tl.fromTo('.intro__logo', { clipPath: 'inset(100% 0% 0% 0%)', y: 40 }, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: 1.2, ease: 'expo.out' })
+      .from('[data-intro-sub]', { y: 16, autoAlpha: 0, duration: 0.8, ease: 'expo.out' }, 0.75)
+      .fromTo('.intro__faiscas', { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.9, ease: 'power2.inOut' }, 0.6)
+      .to('.intro__centro', { yPercent: -18, autoAlpha: 0, duration: 0.7, ease: 'power3.in' }, 1.75)
+      .to(tela, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.15, ease: 'expo.inOut' }, 1.95)
+      .add(() => (window as Window & { __introResolver?: () => void }).__introResolver?.(), 2.25);
+
+    // Na velocidade original a intro segurava a primeira tela (e o botão de
+    // agendamento) por ~3,1 s. Acelerada, a mesma sequência leva ~1,9 s.
+    tl.timeScale(1.6);
+
+    const pular = () => tl.timeScale(5);
+    tela.addEventListener('click', pular);
+    window.addEventListener('keydown', (e) => e.key === 'Escape' && pular(), { once: true });
+  }
+</script>
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    background: var(--verde);
+    color: var(--sobre-verde);
+    clip-path: inset(0% 0% 0% 0%);
+    cursor: pointer;
+  }
+
+  .intro__centro {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+  }
+
+  .intro__logo {
+    width: clamp(10rem, 8rem + 8vw, 16rem);
+    color: var(--sobre-verde);
+  }
+
+  .intro__sub {
+    font-size: var(--t-pequeno);
+    font-weight: 560;
+    letter-spacing: 0.02em;
+    color: var(--sobre-verde-suave);
+  }
+
+  .intro__faiscas {
+    width: clamp(6rem, 10vw, 8rem);
+    color: var(--caramelo);
+  }
+
+  .intro__pular {
+    position: absolute;
+    right: var(--margem);
+    bottom: 1.5rem;
+    min-height: var(--toque);
+    padding: 0 0.75rem;
+    border: 0;
+    background: none;
+    color: var(--sobre-verde-suave);
+    font-size: var(--t-auxiliar);
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+import Seta from './Seta.astro';
+---
+<!-- Barra discreta de contato no celular: aparece depois da primeira tela
+     (sentinela [data-fim-abertura]) e some na área do CTA final ([data-cta-final]). -->
+<div class="barra-contato" data-barra-contato hidden>
+  <p class="barra-contato__texto">Dra. Thaís Santos, Acupuntura</p>
+  <a class="botao barra-contato__botao" href="/agendar">Agendamento <Seta /></a>
+</div>
+
+<script>
+  const barra = document.querySelector<HTMLElement>('[data-barra-contato]');
+  const fimAbertura = document.querySelector<HTMLElement>('[data-fim-abertura]');
+  const ctaFinal = document.querySelector<HTMLElement>('[data-cta-final]');
+  const celular = window.matchMedia('(max-width: 47.99rem)');
+
+  if (barra && fimAbertura) {
+    barra.hidden = false;
+    let agendado = false;
+    // Decide pela posição atual (e não por transições de interseção), para que
+    // um salto direto ao topo ou ao rodapé também esconda a barra.
+    const atualizar = () => {
+      agendado = false;
+      const passouAbertura = fimAbertura.getBoundingClientRect().top < 0;
+      const noCtaFinal = ctaFinal ? ctaFinal.getBoundingClientRect().top < window.innerHeight * 0.9 : false;
+      const mostrar = celular.matches && passouAbertura && !noCtaFinal;
+      barra.dataset.visivel = String(mostrar);
+      barra.inert = !mostrar;
+    };
+    const agendar = () => {
+      if (!agendado) {
+        agendado = true;
+        requestAnimationFrame(atualizar);
+      }
+    };
+    window.addEventListener('scroll', agendar, { passive: true });
+    window.addEventListener('resize', agendar);
+    celular.addEventListener('change', agendar);
+    atualizar();
+  }
+</script>
+
+<style>
+  .barra-contato {
+    position: fixed;
+    inset: auto 0.75rem max(0.75rem, env(safe-area-inset-bottom)) 0.75rem;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-radius: 6px;
+    background: var(--papel-claro);
+    box-shadow: 0 0 0 1px var(--linha), 0 10px 30px -12px rgb(18 39 27 / 0.35);
+    opacity: 0;
+    translate: 0 120%;
+    transition:
+      opacity var(--d-menu) var(--curva-entrada),
+      translate var(--d-menu) var(--curva-entrada);
+  }
+
+  .barra-contato[data-visivel='true'] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .barra-contato__texto {
+    font-size: var(--t-auxiliar);
+    font-weight: 560;
+    color: var(--verde);
+    line-height: 1.3;
+  }
+
+  .barra-contato__botao {
+    min-height: var(--toque);
+    padding-block: 0.5rem;
+    font-size: var(--t-pequeno);
+  }
+
+  @media (min-width: 48rem) {
+    .barra-contato {
+      display: none;
+    }
+  }
+</style>

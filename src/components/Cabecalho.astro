@@ -1,0 +1,331 @@
+---
+import Icone from './Icone.astro';
+
+const itens = [
+  { href: '/sobre', texto: 'A médica' },
+  { href: '/acupuntura-medica', texto: 'Acupuntura médica' },
+  { href: '/primeira-consulta', texto: 'Primeira consulta' },
+  { href: '/artigos', texto: 'Artigos' },
+];
+const atual = Astro.url.pathname.replace(/\.html$/, '');
+const ativo = (href: string) => atual === href || atual.startsWith(`${href}/`);
+---
+<header class="cabecalho" data-cabecalho>
+  <div class="envoltorio cabecalho__linha">
+    <a class="cabecalho__marca" href="/" aria-label="Dra. Thaís Santos, página inicial">
+      <Icone nome="nome-horizontal" class="cabecalho__logo" />
+    </a>
+
+    <nav class="nav-desktop" aria-label="Principal" data-nav-lista>
+      <span class="nav-desktop__indicador" aria-hidden="true"></span>
+      <ul class="nav-desktop__lista">
+        {itens.map((item) => (
+          <li>
+            <a href={item.href} class="nav-desktop__item" aria-current={ativo(item.href) ? 'page' : undefined}>
+              <Icone nome="faisca" class="nav-desktop__marca" />
+              {item.texto}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a href="/agendar" class="nav-desktop__agendar">Agendamento</a>
+        </li>
+      </ul>
+    </nav>
+
+    <button class="botao-menu" type="button" aria-haspopup="dialog" aria-controls="menu-celular" data-abrir-menu>
+      <span>Menu</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h16M4 16h16" /></svg>
+    </button>
+  </div>
+
+  <dialog class="menu-celular" id="menu-celular" aria-label="Menu">
+    <div class="menu-celular__topo">
+      <Icone nome="nome-horizontal" class="cabecalho__logo" />
+      <button class="botao-menu" type="button" data-fechar-menu>
+        <span>Fechar</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    </div>
+    <nav aria-label="Principal, celular">
+      <ul class="menu-celular__lista">
+        <li><a href="/" aria-current={atual === '/' ? 'page' : undefined}>Início</a></li>
+        {itens.map((item) => (
+          <li><a href={item.href} aria-current={ativo(item.href) ? 'page' : undefined}>{item.texto}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <a class="botao menu-celular__agendar" href="/agendar">Solicitar agendamento</a>
+  </dialog>
+</header>
+
+<script>
+  const dialogo = document.querySelector<HTMLDialogElement>('#menu-celular');
+  const abrir = document.querySelector<HTMLButtonElement>('[data-abrir-menu]');
+  const fechar = document.querySelector<HTMLButtonElement>('[data-fechar-menu]');
+  const avisar = (aberto: boolean) => window.dispatchEvent(new CustomEvent('menu', { detail: aberto }));
+  abrir?.addEventListener('click', () => {
+    dialogo?.showModal();
+    avisar(true);
+  });
+  fechar?.addEventListener('click', () => dialogo?.close());
+  dialogo?.addEventListener('close', () => {
+    avisar(false);
+    abrir?.focus();
+  });
+
+  // Sublinhado que desliza até o item sob o ponteiro e volta ao item atual.
+  const lista = document.querySelector<HTMLElement>('[data-nav-lista]');
+  if (lista) {
+    const itens = [...lista.querySelectorAll<HTMLElement>('.nav-desktop__item')];
+    const mover = (alvo?: HTMLElement | null) => {
+      if (!alvo) {
+        lista.style.setProperty('--indicador-o', '0');
+        return;
+      }
+      const base = lista.getBoundingClientRect();
+      const r = alvo.getBoundingClientRect();
+      lista.style.setProperty('--indicador-x', `${r.left - base.left}px`);
+      lista.style.setProperty('--indicador-w', `${r.width}px`);
+      lista.style.setProperty('--indicador-o', '1');
+    };
+    const atual = () => itens.find((i) => i.getAttribute('aria-current') === 'page');
+    itens.forEach((i) => {
+      i.addEventListener('pointerenter', () => mover(i));
+      i.addEventListener('focus', () => mover(i));
+    });
+    lista.addEventListener('pointerleave', () => mover(atual()));
+    requestAnimationFrame(() => mover(atual()));
+    // A Manrope entra com font-display: swap e muda a largura dos itens.
+    document.fonts.ready.then(() => mover(atual()));
+    window.addEventListener('resize', () => mover(atual()));
+  }
+  dialogo?.addEventListener('click', (e) => {
+    if (e.target === dialogo) dialogo.close();
+  });
+</script>
+
+<style>
+  .cabecalho {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition:
+      translate 0.5s var(--curva-entrada),
+      background-color 0.4s,
+      box-shadow 0.4s;
+  }
+
+  .cabecalho--rolado {
+    background: rgb(238 231 220 / 0.86);
+    backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: 0 1px 0 var(--linha);
+  }
+
+  .cabecalho--oculto {
+    translate: 0 -100%;
+  }
+
+  .cabecalho__linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    min-height: 4.5rem;
+  }
+
+  .cabecalho__marca {
+    display: inline-flex;
+    padding-block: 0.5rem;
+    color: var(--verde);
+  }
+
+  .cabecalho :global(.cabecalho__logo) {
+    width: clamp(10.5rem, 8rem + 6vw, 13.5rem);
+  }
+
+  .nav-desktop {
+    position: relative;
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .cabecalho__linha {
+      min-height: 5.75rem;
+    }
+    .nav-desktop {
+      display: block;
+    }
+    .botao-menu[data-abrir-menu] {
+      display: none;
+    }
+  }
+
+  .nav-desktop__lista {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 0.2rem + 1.6vw, 2.25rem);
+  }
+
+  .nav-desktop__indicador {
+    position: absolute;
+    left: 0;
+    bottom: 0.45rem;
+    height: 1px;
+    width: var(--indicador-w, 0);
+    translate: var(--indicador-x, 0) 0;
+    background: var(--caramelo);
+    opacity: var(--indicador-o, 0);
+    transition:
+      translate 0.45s var(--curva-entrada),
+      width 0.45s var(--curva-entrada),
+      opacity 0.3s;
+  }
+
+  .nav-desktop__item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--toque);
+    font-size: var(--t-pequeno);
+    font-weight: 540;
+    color: var(--tinta);
+    text-decoration: none;
+  }
+
+  .nav-desktop__item:hover {
+    color: var(--verde);
+  }
+
+  /* Marca estável no item ativo: uma faísca acima do texto, além da cor. */
+  .nav-desktop__item :global(.nav-desktop__marca) {
+    position: absolute;
+    left: 50%;
+    top: 0.1rem;
+    width: 0.6rem;
+    translate: -50% 0;
+    color: var(--caramelo);
+    opacity: 0;
+  }
+
+  .nav-desktop__item[aria-current='page'] {
+    color: var(--verde);
+    font-weight: 640;
+  }
+
+  .nav-desktop__item[aria-current='page'] :global(.nav-desktop__marca) {
+    opacity: 1;
+  }
+
+  .nav-desktop__agendar {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--toque);
+    padding-inline: 1.1rem;
+    border: 1px solid var(--linha-forte);
+    border-radius: var(--raio);
+    font-size: var(--t-pequeno);
+    font-weight: 620;
+    color: var(--verde);
+    text-decoration: none;
+    transition: border-color var(--d-foco) var(--curva-saida), background-color var(--d-foco) var(--curva-saida);
+  }
+
+  .nav-desktop__agendar:hover {
+    border-color: var(--verde);
+    background: var(--papel-claro);
+  }
+
+  .botao-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--toque);
+    min-width: var(--toque);
+    padding: 0 0.25rem 0 0.75rem;
+    border: 0;
+    background: none;
+    color: var(--verde);
+    font-weight: 600;
+    font-size: var(--t-pequeno);
+    cursor: pointer;
+  }
+
+  .botao-menu svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .menu-celular {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0 var(--margem) 2rem;
+    border: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    opacity: 0;
+    translate: 0 -0.75rem;
+    transition:
+      opacity var(--d-menu) var(--curva-entrada),
+      translate var(--d-menu) var(--curva-entrada),
+      overlay var(--d-menu) allow-discrete,
+      display var(--d-menu) allow-discrete;
+  }
+
+  .menu-celular[open] {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .menu-celular[open] {
+      opacity: 0;
+      translate: 0 -0.75rem;
+    }
+  }
+
+  .menu-celular::backdrop {
+    background: rgb(18 39 27 / 0.3);
+  }
+
+  .menu-celular__topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 4.5rem;
+    color: var(--verde);
+  }
+
+  .menu-celular__lista {
+    display: grid;
+    gap: 0.25rem;
+    margin-block: 2rem auto;
+  }
+
+  .menu-celular__lista a {
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    font-family: var(--fonte-display);
+    font-size: 2rem;
+    text-transform: uppercase;
+    color: var(--verde);
+    text-decoration: none;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .menu-celular__lista a[aria-current='page'] {
+    color: var(--caramelo-texto);
+  }
+
+  .menu-celular__agendar {
+    justify-content: center;
+    margin-top: 2rem;
+  }
+</style>

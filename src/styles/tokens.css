@@ -1,0 +1,88 @@
+/* Tokens do site da Dra. Thaís Santos.
+   Cores extraídas de _marca-arthemi/Marca.ai (13/10/2026). */
+
+@font-face {
+  /* [PENDENTE] licença web da Moxa Bestine. Arquivo provisório, só para o
+     protótipo: o build de produção falha enquanto ele existir em /fonts. */
+  font-family: 'Moxa Bestine';
+  src: url('/fonts/moxa-bestine-provisoria.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Marca */
+  --verde: #193425;
+  --salvia: #516c60;
+  --caramelo: #ae7d54;
+  --branco: #ffffff;
+
+  /* Superfícies derivadas das paredes e da madeira do consultório */
+  --papel: #eee7dc;
+  --papel-claro: #f8f4ee;
+  --verde-profundo: #12271b;
+
+  /* Texto */
+  --tinta: #1f2a24;
+  --tinta-suave: #4a5a51;
+  --caramelo-texto: #8a5c37; /* caramelo escurecido para texto pequeno (AA sobre papel) */
+  --sobre-verde: #f3eee5;
+  --sobre-verde-suave: #c9d3cc;
+
+  --linha: rgb(25 52 37 / 0.18);
+  --linha-forte: rgb(25 52 37 / 0.34);
+  --linha-sobre-verde: rgb(243 238 229 / 0.22);
+
+  /* Tipografia */
+  --fonte-display: 'Moxa Bestine', serif;
+  --fonte-texto: 'Manrope Variable', 'Manrope', system-ui, sans-serif;
+
+  --t-auxiliar: 0.875rem;   /* 14 */
+  --t-pequeno: 0.9375rem;   /* 15 */
+  --t-corpo: 1.0625rem;     /* 17 no celular */
+  --t-lead: 1.25rem;        /* 20 */
+  --t-h3: 1.375rem;         /* 22 */
+  --t-h2: clamp(1.875rem, 1.2rem + 3vw, 3.75rem);   /* 30 → 60 */
+  --t-h1: clamp(2.5rem, 1.1rem + 5.6vw, 6.75rem);   /* 40 → 108 */
+
+  /* Grade e espaço */
+  --largura-max: 80rem;      /* 1280 */
+  --margem: 1.25rem;         /* 20 no celular */
+  --vao: 1rem;
+  --colunas: 4;
+  --secao: clamp(3.5rem, 2rem + 6vw, 9rem);  /* 56 → 144 */
+  --leitura: 66ch;
+  --toque: 2.75rem;          /* 44 */
+  --raio: 3px;
+
+  /* Movimento */
+  --curva-entrada: cubic-bezier(0.22, 1, 0.36, 1);
+  --curva-saida: cubic-bezier(0.2, 0, 0, 1);
+  --d-pressao: 90ms;
+  --d-foco: 180ms;
+  --d-sublinhado: 200ms;
+  --d-ficha: 160ms;
+  --d-marcador: 210ms;
+  --d-menu: 230ms;
+  --d-faq: 250ms;
+  --d-foto: 340ms;
+  --d-transicao-pagina: 400ms;
+  --d-abertura: 650ms;
+  --d-apoio: 520ms;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --margem: 2rem;
+    --vao: 1.5rem;
+    --colunas: 12;
+    --t-corpo: 1.125rem; /* 18 */
+  }
+}
+
+@media (min-width: 90rem) {
+  :root {
+    --margem: 3rem;
+  }
+}

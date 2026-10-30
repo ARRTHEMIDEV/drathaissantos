@@ -1,0 +1,211 @@
+---
+import Foto from '../Foto.astro';
+import Seta from '../Seta.astro';
+import Pendente from '../Pendente.astro';
+import { artigosVisiveis, nomesDosTemas } from '../../lib/artigos';
+import { modoPreview } from '../../lib/modo';
+
+const [destaque, ...demais] = await artigosVisiveis();
+const outros = demais.slice(0, 2);
+
+// [PENDENTE] Os outros dois artigos iniciais ainda não foram escritos.
+// Só os previews mostram o lugar reservado; o site público lista apenas
+// artigos publicados, sem anunciar texto em preparação.
+const emPreparacao = modoPreview
+  ? [
+      'Medo de agulha: o que perguntar antes de uma sessão',
+      'Dor cervical: por que a avaliação vem antes do procedimento',
+    ].slice(0, 2 - outros.length)
+  : [];
+---
+<section class="leituras secao" aria-labelledby="titulo-leituras">
+  <div class="envoltorio grade leituras__grade">
+    <h2 class="display leituras__titulo" id="titulo-leituras" data-revelar="linhas">Para entender melhor</h2>
+
+    {destaque && (
+      <a class="leituras__destaque" href={`/artigos/${destaque.id}`}>
+        <div class="leituras__moldura" data-revelar="imagem">
+          <Foto
+            foto={{ src: destaque.data.capa, alt: '', foco: { desktop: destaque.data.capaFoco, celular: destaque.data.capaFoco } }}
+            proporcao="3 / 2"
+            sizes="(min-width: 64rem) 58vw, 100vw"
+            class="leituras__foto"
+            transicao={`capa-${destaque.id}`}
+          />
+          <span class="leituras__tema">{nomesDosTemas[destaque.data.tema]}</span>
+        </div>
+        <span class="leituras__nome">{destaque.data.titulo}</span>
+        <span class="leituras__resumo">{destaque.data.resumo}</span>
+        <span class="leituras__acao">Ler o artigo <Seta /></span>
+      </a>
+    )}
+
+    <ul class="leituras__outros" data-revelar="subir" data-revelar-filhos>
+      {outros.map((artigo, i) => (
+        <li>
+          <span class="leituras__indice" aria-hidden="true">{String(i + 2).padStart(2, '0')}</span>
+          <a class="leituras__outro-nome" href={`/artigos/${artigo.id}`}>{artigo.data.titulo}</a>
+        </li>
+      ))}
+      {emPreparacao.map((titulo, i) => (
+        <li>
+          <span class="leituras__indice" aria-hidden="true">{String(outros.length + i + 2).padStart(2, '0')}</span>
+          <span class="leituras__outro-nome">{titulo}</span>
+          <Pendente motivo="artigo em preparação" />
+        </li>
+      ))}
+      <li>
+        <a class="botao botao--contorno" href="/artigos" data-magnetico="0.2">Todos os artigos <Seta /></a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .leituras__grade {
+    row-gap: 2.5rem;
+  }
+
+  .leituras__titulo {
+    grid-column: 1 / -1;
+    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+  }
+
+  .leituras__destaque {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .leituras__moldura {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--raio);
+  }
+
+  .leituras__moldura :global(img) {
+    transition: scale 1.4s var(--curva-entrada), filter 0.8s;
+  }
+
+  .leituras__moldura::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--verde);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.8s var(--curva-entrada);
+  }
+
+  .leituras__destaque:hover .leituras__moldura::after {
+    opacity: 0.28;
+  }
+
+  .leituras__destaque:hover .leituras__moldura :global(img),
+  .leituras__destaque:focus-visible .leituras__moldura :global(img) {
+    scale: 1.07;
+  }
+
+  .leituras__tema {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    z-index: 1;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: var(--papel-claro);
+    color: var(--verde);
+    font-size: var(--t-auxiliar);
+    font-weight: 650;
+  }
+
+  .leituras__nome {
+    font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.75rem);
+    font-weight: 560;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    color: var(--verde);
+    text-wrap: balance;
+    background-image: linear-gradient(var(--verde), var(--verde));
+    background-size: 0 2px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.8s var(--curva-entrada);
+    justify-self: start;
+  }
+
+  .leituras__destaque:hover .leituras__nome {
+    background-size: 100% 2px;
+  }
+
+  .leituras__resumo {
+    color: var(--tinta-suave);
+    max-width: 42rem;
+  }
+
+  .leituras__acao {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 620;
+    color: var(--verde);
+  }
+
+  .leituras__acao :global(.seta) {
+    width: 1.1rem;
+    transition: translate var(--d-foco) var(--curva-saida);
+  }
+
+  .leituras__destaque:hover :global(.seta) {
+    translate: 4px 0;
+  }
+
+  .leituras__outros {
+    grid-column: 1 / -1;
+    display: grid;
+    align-content: start;
+  }
+
+  .leituras__outros li {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--linha-forte);
+  }
+
+  .leituras__outros li:last-child {
+    border-top: 0;
+    justify-items: start;
+  }
+
+  .leituras__indice {
+    font-family: var(--fonte-display);
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--caramelo);
+  }
+
+  .leituras__outro-nome {
+    font-size: var(--t-h3);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--verde);
+  }
+
+  a.leituras__outro-nome {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (min-width: 64rem) {
+    .leituras__destaque {
+      grid-column: 1 / span 7;
+    }
+    .leituras__outros {
+      grid-column: 9 / span 4;
+      align-self: end;
+    }
+  }
+</style>

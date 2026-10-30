@@ -1,0 +1,515 @@
+@import '@fontsource-variable/manrope';
+@import './tokens.css';
+
+/* Transição entre documentos (Chrome/Edge/Safari recentes). Sem suporte, a
+   navegação é a comum. A capa do artigo recebe nome próprio nas duas páginas. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: var(--d-transicao-pagina);
+  animation-timing-function: var(--curva-entrada);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-synthesis: none;
+  scroll-padding-top: 5rem;
+  /* A intro trava a rolagem (overflow hidden) e esconde a barra; sem a
+     calha reservada, a página inteira pulava ~15px ao fim da intro. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: var(--t-corpo);
+  line-height: 1.62;
+  font-weight: 420;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg,
+video,
+picture {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------- Tipografia ---------- */
+
+.display {
+  font-family: var(--fonte-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.02;
+  color: var(--verde);
+  text-wrap: balance;
+}
+
+h2.display {
+  font-size: var(--t-h2);
+}
+
+main:focus {
+  outline: none;
+}
+
+.titulo-texto {
+  font-family: var(--fonte-texto);
+  font-weight: 640;
+  font-size: var(--t-h3);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--verde);
+  text-wrap: balance;
+}
+
+.lead {
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--tinta);
+  text-wrap: pretty;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.auxiliar {
+  font-size: var(--t-pequeno);
+  color: var(--tinta-suave);
+  line-height: 1.5;
+}
+
+/* ---------- Estrutura ---------- */
+
+.envoltorio {
+  width: 100%;
+  max-width: calc(var(--largura-max) + var(--margem) * 2);
+  margin-inline: auto;
+  padding-inline: var(--margem);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas), minmax(0, 1fr));
+  column-gap: var(--vao);
+}
+
+.secao {
+  padding-block: var(--secao);
+}
+
+.sobre-verde {
+  background: var(--verde);
+  color: var(--sobre-verde);
+}
+
+.sobre-verde .display,
+.sobre-verde .titulo-texto,
+.sobre-verde .lead {
+  color: var(--sobre-verde);
+}
+
+.sobre-verde .auxiliar {
+  color: var(--sobre-verde-suave);
+}
+
+.visualmente-oculto {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Links e botões ---------- */
+
+a {
+  color: inherit;
+}
+
+.link {
+  color: var(--verde);
+  font-weight: 560;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size var(--d-sublinhado) var(--curva-saida);
+}
+
+.link:hover {
+  background-size: 100% 2px;
+}
+
+.sobre-verde .link {
+  color: var(--sobre-verde);
+}
+
+.botao {
+  --fundo: var(--verde);
+  --texto: var(--sobre-verde);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.4rem 0.85rem 1.5rem;
+  border: 1px solid var(--fundo);
+  border-radius: var(--raio);
+  background: var(--fundo);
+  color: var(--texto);
+  font-weight: 620;
+  font-size: 1rem;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--d-foco) var(--curva-saida),
+    border-color var(--d-foco) var(--curva-saida),
+    color var(--d-foco) var(--curva-saida);
+}
+
+.botao .seta {
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: translate var(--d-foco) var(--curva-saida);
+}
+
+.botao:hover {
+  --fundo: var(--verde-profundo);
+}
+
+.botao:hover .seta {
+  translate: 3px 0;
+}
+
+.botao:active {
+  transition-duration: var(--d-pressao);
+  background: var(--salvia);
+  border-color: var(--salvia);
+}
+
+.botao--grande {
+  min-height: 3.75rem;
+  padding: 1rem 1.6rem 1rem 1.75rem;
+  font-size: 1.05rem;
+}
+
+.botao--claro {
+  --fundo: var(--sobre-verde);
+  --texto: var(--verde);
+}
+
+.botao--claro:hover {
+  --fundo: var(--branco);
+}
+
+.botao--contorno {
+  --fundo: transparent;
+  --texto: var(--verde);
+  border-color: var(--linha-forte);
+}
+
+.botao--contorno:hover {
+  --fundo: var(--papel-claro);
+  border-color: var(--verde);
+}
+
+:focus-visible {
+  outline: 2px solid var(--caramelo-texto);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.sobre-verde :focus-visible {
+  outline-color: var(--sobre-verde);
+}
+
+/* ---------- Marcação de pendências ----------
+   Visível no protótipo e nos previews para a revisão da Dra. Thaís.
+   O build de produção falha se encontrar data-pendente no HTML. */
+
+.pendente {
+  background: rgb(174 125 84 / 0.2);
+  box-shadow: inset 0 -2px 0 var(--caramelo);
+  color: inherit;
+  padding: 0 0.15em;
+  border-radius: 2px;
+}
+
+.pendente__motivo {
+  font-family: var(--fonte-texto);
+  font-size: 0.72em;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--caramelo-texto);
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+.sobre-verde .pendente__motivo {
+  color: #e8c9a8;
+}
+
+/* ---------- Movimento reduzido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  @view-transition {
+    navigation: none;
+  }
+}
+
+/* ---------- Impressão ---------- */
+
+@media print {
+  :root {
+    --papel: #fff;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .nao-imprimir,
+  .cabecalho,
+  .rodape,
+  .barra-contato {
+    display: none !important;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  .pendente {
+    background: none;
+    box-shadow: none;
+  }
+}
+
+/* =========================================================
+   Movimento: estados iniciais, rolagem suave, grão, cortina
+   ========================================================= */
+
+/* Só esconde o que vai ser revelado quando o movimento está ativo. Se o
+   script não ficar pronto em 4 s, .sem-movimento mostra tudo. */
+.movimento [data-revelar] {
+  visibility: hidden;
+}
+
+.sem-movimento [data-revelar] {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: none !important;
+}
+
+.linha-revelada {
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+html.intro-ativa {
+  overflow: hidden;
+}
+
+/* Grão de papel: textura estática e discreta sobre o site inteiro. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: 120;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.12 0 0 0 0 0.1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation: grao 1.2s steps(6) infinite;
+}
+
+@keyframes grao {
+  0% { translate: 0 0; }
+  20% { translate: -3% 2%; }
+  40% { translate: 2% -3%; }
+  60% { translate: -2% -1%; }
+  80% { translate: 3% 3%; }
+  100% { translate: 0 0; }
+}
+
+
+/* Troca de página: a nova sobe como uma cortina sobre a anterior. */
+::view-transition-old(root) {
+  animation: 520ms var(--curva-saida) both pagina-sai;
+}
+
+::view-transition-new(root) {
+  animation: 820ms cubic-bezier(0.76, 0, 0.24, 1) both pagina-entra;
+}
+
+@keyframes pagina-sai {
+  to {
+    opacity: 0.4;
+    scale: 0.97;
+    translate: 0 -2%;
+  }
+}
+
+@keyframes pagina-entra {
+  from {
+    clip-path: inset(100% 0 0 0);
+    translate: 0 6%;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    translate: 0 0;
+  }
+}
+
+/* Botão com preenchimento que varre da esquerda ao passar o ponteiro. */
+.botao {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.botao::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--caramelo);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.55s var(--curva-entrada);
+}
+
+.botao:hover::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.botao--contorno::before {
+  background: var(--verde);
+}
+
+.botao--contorno:hover {
+  --texto: var(--sobre-verde);
+  border-color: var(--verde);
+}
+
+.botao--claro::before {
+  background: var(--caramelo);
+}
+
+.botao--claro:hover {
+  --texto: var(--branco);
+}
+
+.botao:hover {
+  --texto: var(--branco);
+}
+
+/* Links editoriais com faísca que aparece ao passar o ponteiro. */
+.link-faisca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--verde);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-faisca .icone {
+  width: 0.7rem;
+  color: var(--caramelo);
+  scale: 0;
+  rotate: -90deg;
+  transition: scale 0.4s var(--curva-entrada), rotate 0.4s var(--curva-entrada);
+}
+
+.link-faisca:hover .icone,
+.link-faisca:focus-visible .icone {
+  scale: 1;
+  rotate: 0deg;
+}
+
+/* O grão animado repinta uma camada do dobro da tela a cada 0,2 s. No
+   celular isso custa bateria e fluidez da rolagem; parado, o efeito some
+   pouco. */
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  body::after {
+    animation: none;
+  }
+}

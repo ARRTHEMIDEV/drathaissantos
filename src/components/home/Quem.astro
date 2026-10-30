@@ -1,0 +1,234 @@
+---
+import Foto from '../Foto.astro';
+import Icone from '../Icone.astro';
+import Seta from '../Seta.astro';
+import Pendente from '../Pendente.astro';
+import Selo from '../fx/Selo.astro';
+import { fotos } from '../../data/fotos';
+import { profissional as p } from '../../data/profissional';
+
+const marcos = p.formacao.filter((f) => f.periodo);
+---
+<section class="quem secao" aria-labelledby="titulo-quem">
+  <div class="envoltorio grade quem__grade">
+    <figure class="quem__retrato">
+      <!-- O arco aparece uma única vez no site, como assinatura. -->
+      <div class="quem__arco" data-revelar="imagem">
+        <div class="quem__parallax" data-parallax="8">
+          <Foto foto={fotos.retratoTrajetoria} proporcao="3 / 4" proporcaoCelular="4 / 5" sizes="(min-width: 64rem) 40vw, 100vw" />
+        </div>
+      </div>
+      <div class="quem__selo"><Selo tom="claro" /></div>
+      <figcaption class="auxiliar">No consultório, em {p.cidade}.</figcaption>
+    </figure>
+
+    <div class="quem__texto">
+      <h2 class="display quem__titulo" id="titulo-quem" data-revelar="linhas">Quem vai atender</h2>
+      <p class="lead" data-revelar="subir">
+        {p.nome} é médica formada pela UFMG, fez a especialização em Acupuntura no IMBA e tem título de
+        especialista em Acupuntura pelo CMBA e pela AMB. Atende em consultório particular em {p.cidade} desde 2024.
+      </p>
+      <blockquote class="quem__passagem" data-revelar="subir">
+        <Icone nome="faisca" class="quem__aspas" />
+        <p><Pendente motivo="passagem real da trajetória, nas palavras dela" /></p>
+      </blockquote>
+
+      <div class="quem__linha-tempo" data-revelar="subir">
+        <span class="quem__eixo" aria-hidden="true"><span class="quem__eixo-cheio" data-desenhar=".quem__linha-tempo" data-desenhar-horizontal></span></span>
+        <ol>
+          {marcos.map((m) => (
+            <li data-acender>
+              <span class="quem__ponto" aria-hidden="true"><Icone nome="faisca" /></span>
+              <span class="quem__ano">{m.periodo}</span>
+              <span class="quem__marco auxiliar">{m.texto.replace(/ pela Universidade Federal de Minas Gerais \(UFMG\)/, ', UFMG')}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="quem__links" data-revelar="subir">
+        <a class="botao botao--contorno" href="/sobre" data-magnetico="0.2">Conhecer a trajetória <Seta /></a>
+        <a class="link" href={p.buscaCfm} rel="noopener" target="_blank">Conferir o registro no CFM</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .quem__grade {
+    row-gap: 3rem;
+  }
+
+  .quem__retrato {
+    position: relative;
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .quem__arco {
+    overflow: hidden;
+    border-radius: 999px 999px var(--raio) var(--raio);
+  }
+
+  .quem__parallax {
+    overflow: hidden;
+  }
+
+  .quem__selo {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 2.5rem;
+  }
+
+  .quem__texto {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.75rem;
+    align-content: center;
+  }
+
+  .quem__titulo {
+    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+  }
+
+  .quem__texto .lead {
+    max-width: 38rem;
+  }
+
+  .quem__passagem {
+    position: relative;
+    padding-left: 2rem;
+    font-size: var(--t-lead);
+  }
+
+  .quem__passagem :global(.quem__aspas) {
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    width: 1rem;
+    color: var(--caramelo);
+  }
+
+  .quem__linha-tempo {
+    position: relative;
+    padding-top: 1.75rem;
+  }
+
+  .quem__eixo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0.7rem;
+    height: 1px;
+    background: var(--linha-forte);
+  }
+
+  .quem__eixo-cheio {
+    position: absolute;
+    inset: 0;
+    background: var(--caramelo);
+  }
+
+  .quem__linha-tempo ol {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .quem__linha-tempo li {
+    position: relative;
+    display: grid;
+    gap: 0.3rem;
+    align-content: start;
+  }
+
+  .quem__ponto {
+    position: absolute;
+    left: -0.2rem;
+    top: -1.65rem;
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--papel);
+    color: var(--tinta-suave);
+    transition: color 0.5s, scale 0.5s var(--curva-entrada), rotate 0.6s var(--curva-entrada);
+  }
+
+  .quem__ponto :global(.icone) {
+    width: 0.85rem;
+  }
+
+  .quem__linha-tempo li:global(.aceso) .quem__ponto,
+  :global(html:not(.movimento)) .quem__ponto {
+    color: var(--caramelo);
+    scale: 1.35;
+    rotate: 90deg;
+  }
+
+  .quem__ano {
+    font-family: var(--fonte-display);
+    font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+    line-height: 1.1;
+    color: var(--verde);
+  }
+
+  .quem__marco {
+    font-size: var(--t-auxiliar);
+  }
+
+  .quem__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+  }
+
+  @media (max-width: 40rem) {
+    .quem__linha-tempo ol {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.75rem;
+      padding-left: 1.75rem;
+    }
+    .quem__eixo {
+      left: 0.5rem;
+      right: auto;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      height: auto;
+    }
+    .quem__linha-tempo {
+      padding-top: 0;
+    }
+    .quem__ponto {
+      left: -1.95rem;
+      top: 0.25rem;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .quem__retrato {
+      grid-column: 1 / span 7;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .quem__retrato {
+      grid-column: 1 / span 5;
+      align-self: start;
+      position: sticky;
+      top: 6rem;
+    }
+    .quem__selo {
+      right: -3.5rem;
+    }
+    .quem__texto {
+      grid-column: 7 / span 6;
+    }
+  }
+</style>

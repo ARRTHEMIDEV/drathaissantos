@@ -1,0 +1,57 @@
+---
+// Esqueleto de página ainda sem conteúdo aprovado. Mostra a estrutura que a
+// página terá e marca tudo como pendente. Não vai para produção assim: o
+// verificador de publicação bloqueia o build enquanto houver data-pendente.
+import Base from './Base.astro';
+import Pendente from '../components/Pendente.astro';
+import Seta from '../components/Seta.astro';
+
+interface Props {
+  titulo: string;
+  descricao: string;
+  estrutura: string[];
+  motivo: string;
+}
+const { titulo, descricao, estrutura, motivo } = Astro.props;
+---
+<Base titulo={titulo} descricao={descricao}>
+  <section class="envoltorio em-preparo secao">
+    <h1 class="display em-preparo__titulo">{titulo}</h1>
+    <p class="lead"><Pendente motivo={motivo} /></p>
+    <div class="em-preparo__estrutura">
+      <h2 class="titulo-texto">Estrutura prevista</h2>
+      <ol>
+        {estrutura.map((item) => <li>{item}</li>)}
+      </ol>
+    </div>
+    <slot />
+    <a class="botao" href="/agendar">Solicitar agendamento <Seta /></a>
+  </section>
+</Base>
+
+<style>
+  .em-preparo {
+    display: grid;
+    gap: 2rem;
+    justify-items: start;
+    max-width: 52rem;
+  }
+
+  .em-preparo__titulo {
+    font-size: clamp(2.5rem, 1.2rem + 4.8vw, 5.5rem);
+  }
+
+  .em-preparo__estrutura {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.5rem 1.75rem;
+    border: 1px dashed var(--linha-forte);
+    border-radius: 4px;
+  }
+
+  .em-preparo__estrutura ol {
+    display: grid;
+    gap: 0.4rem;
+    padding-left: 1.25rem;
+  }
+</style>

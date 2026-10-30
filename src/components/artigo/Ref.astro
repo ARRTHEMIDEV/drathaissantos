@@ -1,0 +1,37 @@
+---
+// Marcador de fonte. Abre uma ficha pequena junto ao trecho:
+// no desktop, popover ancorado na margem do texto (CSS Anchor Positioning,
+// com o centro da tela como alternativa); no celular, a ficha abre no fluxo
+// do texto. Esc fecha, o foco volta ao marcador, o texto continua selecionável.
+import { getEntry } from 'astro:content';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const fonte = await getEntry('fontes', id);
+if (!fonte) throw new Error(`Fonte "${id}" não encontrada em src/content/fontes`);
+
+const lista = Astro.locals.fontesArtigo ?? [];
+const posicao = lista.indexOf(id);
+if (posicao === -1) throw new Error(`A fonte "${id}" é citada no texto mas não está na lista de fontes do artigo`);
+const numero = posicao + 1;
+Astro.locals.contadorRef = (Astro.locals.contadorRef ?? 0) + 1;
+const fichaId = `ficha-${id}-${Astro.locals.contadorRef}`;
+const f = fonte.data;
+---
+<span class="ref"><button
+    type="button"
+    class="ref__botao"
+    popovertarget={fichaId}
+    aria-controls={fichaId}
+    style={`anchor-name:--${fichaId}`}
+    data-ficha={fichaId}
+  ><span class="visualmente-oculto">Fonte </span>{numero}</button><span
+    class="ficha"
+    id={fichaId}
+    popover
+    role="note"
+    aria-label={`Fonte ${numero}: ${f.citacao}`}
+    style={`position-anchor:--${fichaId}`}
+  ><span class="ficha__numero" aria-hidden="true">{numero}</span><span class="ficha__titulo">{f.titulo}</span><span class="ficha__meta">{f.autores.split(',').slice(0, 1)} e colaboradores. {f.publicacao}, {f.ano}.</span><span class="ficha__meta">{f.tipo}</span><span class="ficha__acoes"><a class="link" href={f.url} rel="noopener" target="_blank">Abrir o estudo</a><a class="link" href={`#fonte-${id}`}>Ver todas as fontes</a></span><button type="button" class="ficha__fechar" popovertarget={fichaId} popovertargetaction="hide" data-fechar-ficha={fichaId}>Fechar</button></span></span>

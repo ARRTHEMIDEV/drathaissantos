@@ -1,0 +1,181 @@
+---
+import Pendente from '../Pendente.astro';
+import { profissional as p } from '../../data/profissional';
+
+// Só respostas aprovadas. Não presumir convênio, reembolso, estacionamento,
+// acessibilidade física ou prazo de resposta.
+const duvidas = [
+  { pergunta: 'Quanto tempo dura a primeira consulta?', motivo: 'resposta a confirmar' },
+  { pergunta: 'Preciso levar exames?', motivo: 'resposta a confirmar' },
+  { pergunta: 'A primeira sessão de acupuntura acontece no mesmo dia?', motivo: 'resposta a confirmar' },
+];
+---
+<section class="praticas secao" aria-labelledby="titulo-praticas">
+  <div class="envoltorio grade praticas__grade">
+    <h2 class="display praticas__titulo" id="titulo-praticas" data-revelar="linhas">Informações práticas</h2>
+
+    <dl class="praticas__lista" data-revelar="subir" data-revelar-filhos>
+      <div class="praticas__item">
+        <dt>Atendimento</dt>
+        <dd><Pendente motivo="confirmar">Particular.</Pendente></dd>
+      </div>
+      <div class="praticas__item">
+        <dt>Onde</dt>
+        <dd>
+          {p.local.nome}<br />
+          {p.local.confirmado ? (
+            <>{p.local.endereco}, {p.local.bairro}, {p.cidade}</>
+          ) : (
+            <Pendente motivo="confirmar endereço">{p.local.endereco}, {p.local.bairro}, {p.cidade}</Pendente>
+          )}
+          <br />
+          <a class="link" href={p.local.rota} rel="noopener" target="_blank">Ver rota no mapa</a>
+        </dd>
+      </div>
+      <div class="praticas__item">
+        <dt>Como solicitar horários</dt>
+        <dd>
+          Pelo WhatsApp do consultório. Abrir a conversa não confirma a consulta: a equipe responde com os horários disponíveis.
+        </dd>
+      </div>
+      <div class="praticas__item">
+        <dt>Valores</dt>
+        <dd><Pendente motivo="decisão da Dra. Thaís sobre mostrar o valor" /></dd>
+      </div>
+    </dl>
+
+    <div class="praticas__duvidas" data-revelar="subir">
+      <h3 class="titulo-texto">Dúvidas frequentes</h3>
+      {duvidas.map((d) => (
+        <details class="duvida">
+          <summary>{d.pergunta}</summary>
+          <div class="duvida__resposta">
+            <p><Pendente motivo={d.motivo} /></p>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .praticas__grade {
+    row-gap: 2.5rem;
+  }
+
+  .praticas__titulo {
+    grid-column: 1 / -1;
+    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+  }
+
+  .praticas__lista {
+    grid-column: 1 / -1;
+    display: grid;
+  }
+
+  .praticas__item {
+    display: grid;
+    gap: 0.3rem;
+    padding-block: 1.1rem;
+    border-top: 1px solid var(--linha-forte);
+  }
+
+  .praticas__item dt {
+    font-size: var(--t-pequeno);
+    font-weight: 650;
+    color: var(--tinta-suave);
+  }
+
+  .praticas__item dd {
+    margin: 0;
+    max-width: 34rem;
+  }
+
+  .praticas__duvidas {
+    grid-column: 1 / -1;
+    display: grid;
+    align-content: start;
+  }
+
+  .praticas__duvidas .titulo-texto {
+    margin-bottom: 0.5rem;
+  }
+
+  .duvida {
+    border-top: 1px solid var(--linha-forte);
+    interpolate-size: allow-keywords;
+  }
+
+  .duvida:last-child {
+    border-bottom: 1px solid var(--linha-forte);
+  }
+
+  .duvida summary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    padding: 0.75rem 2.5rem 0.75rem 0;
+    font-weight: 600;
+    color: var(--verde);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .duvida summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .duvida summary::after {
+    content: '';
+    position: absolute;
+    right: 0.4rem;
+    top: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    translate: 0 -70%;
+    rotate: 45deg;
+    transition: rotate var(--d-faq) var(--curva-saida), translate var(--d-faq) var(--curva-saida);
+  }
+
+  .duvida[open] summary::after {
+    rotate: -135deg;
+    translate: 0 -20%;
+  }
+
+  /* Altura animada quando o navegador suporta; sem suporte, abre na hora. */
+  .duvida::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size var(--d-faq) var(--curva-saida),
+      content-visibility var(--d-faq) allow-discrete;
+  }
+
+  .duvida[open]::details-content {
+    block-size: auto;
+  }
+
+  .duvida__resposta {
+    padding-bottom: 1.25rem;
+    max-width: 36rem;
+  }
+
+  @media (min-width: 64rem) {
+    /* "Informações" não cabe em 5 colunas a partir de 1280px e a máscara
+       da revelação cortava o "S" final. */
+    .praticas__titulo {
+      grid-column: 1 / span 6;
+    }
+    .praticas__lista {
+      grid-column: 1 / span 5;
+    }
+    .praticas__duvidas {
+      grid-column: 7 / span 6;
+      grid-row: 1 / span 2;
+      align-self: end;
+    }
+  }
+</style>

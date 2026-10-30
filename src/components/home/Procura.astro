@@ -1,0 +1,204 @@
+---
+// Índice de perguntas: linhas tipográficas grandes que levam a cada conteúdo.
+// A escolha só abre conteúdo: não pede sintomas nem sugere tratamento.
+import Icone from '../Icone.astro';
+import Seta from '../Seta.astro';
+
+const itens = [
+  {
+    href: '/acupuntura-medica/enxaqueca',
+    titulo: 'Enxaqueca e outras dores de cabeça',
+    linha: 'O que a pesquisa mostra sobre prevenir crises',
+  },
+  {
+    href: '/acupuntura-medica/dor-no-pescoco',
+    titulo: 'Dor no pescoço que sempre volta',
+    linha: 'Por que a avaliação vem antes do procedimento',
+  },
+  {
+    href: '/primeira-consulta',
+    titulo: 'Como funciona a primeira consulta',
+    linha: 'Da conversa ao plano, etapa por etapa',
+  },
+  {
+    href: '/artigos',
+    titulo: 'Artigos com fontes',
+    linha: 'Dúvidas do consultório respondidas com estudo',
+  },
+];
+---
+<section class="procura secao" aria-labelledby="titulo-procura">
+  <div class="envoltorio procura__envoltorio">
+    <div class="procura__cabeca">
+      <h2 class="display procura__titulo" id="titulo-procura" data-revelar="linhas">O que você procura?</h2>
+      <p class="procura__apoio auxiliar" data-revelar="subir">Escolha um assunto. Cada caminho leva a um conteúdo revisado pela Dra. Thaís.</p>
+    </div>
+
+    <ul class="procura__lista" data-revelar="subir" data-revelar-filhos>
+      {itens.map((item) => (
+        <li class="procura__item">
+          <a class="procura__link" href={item.href}>
+            <Icone nome="faisca" class="procura__marca" />
+            <span class="procura__nome">{item.titulo}</span>
+            <span class="procura__linha">{item.linha}</span>
+            <span class="procura__circulo" aria-hidden="true"><Seta /></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .procura {
+    position: relative;
+  }
+
+  .procura__envoltorio {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .procura__cabeca {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .procura__apoio {
+    max-width: 26rem;
+  }
+
+  .procura__lista {
+    border-top: 1px solid var(--linha-forte);
+  }
+
+  .procura__link {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 1rem;
+    row-gap: 0.35rem;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--linha);
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+  }
+
+  /* Fundo claro que sobe por trás da linha ativa. */
+  .procura__link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--papel-claro);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.6s var(--curva-entrada);
+  }
+
+  .procura__nome {
+    grid-column: 1;
+    font-size: clamp(1.5rem, 1rem + 2.4vw, 3.4rem);
+    font-weight: 560;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--verde);
+    text-wrap: balance;
+    transition: translate 0.6s var(--curva-entrada);
+  }
+
+  .procura__linha {
+    grid-column: 1;
+    color: var(--tinta-suave);
+    font-size: var(--t-pequeno);
+    transition: translate 0.6s var(--curva-entrada) 0.04s;
+  }
+
+  .procura__circulo {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: clamp(2.75rem, 2rem + 2vw, 4rem);
+    aspect-ratio: 1;
+    border: 1px solid var(--linha-forte);
+    border-radius: 50%;
+    color: var(--verde);
+    transition:
+      background-color 0.4s var(--curva-entrada),
+      color 0.4s,
+      border-color 0.4s,
+      rotate 0.6s var(--curva-entrada);
+  }
+
+  .procura__circulo :global(.seta) {
+    width: 1.2rem;
+  }
+
+  .procura__link :global(.procura__marca) {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1rem;
+    color: var(--caramelo);
+    translate: -150% -50%;
+    scale: 0;
+    rotate: -90deg;
+    transition:
+      scale 0.5s var(--curva-entrada),
+      rotate 0.5s var(--curva-entrada),
+      translate 0.5s var(--curva-entrada);
+  }
+
+  .procura__link:hover::before,
+  .procura__link:focus-visible::before {
+    transform: scaleY(1);
+  }
+
+  .procura__link:hover .procura__nome,
+  .procura__link:focus-visible .procura__nome,
+  .procura__link:hover .procura__linha,
+  .procura__link:focus-visible .procura__linha {
+    translate: 2.25rem 0;
+  }
+
+  .procura__link:hover :global(.procura__marca),
+  .procura__link:focus-visible :global(.procura__marca) {
+    scale: 1;
+    rotate: 0deg;
+    translate: 0.4rem -50%;
+  }
+
+  .procura__link:hover .procura__circulo,
+  .procura__link:focus-visible .procura__circulo {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--sobre-verde);
+    rotate: -45deg;
+  }
+
+  @media (min-width: 64rem) {
+    .procura__envoltorio {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--vao);
+    }
+
+    .procura__cabeca {
+      grid-column: 1 / span 4;
+      align-self: start;
+      position: sticky;
+      top: 7rem;
+    }
+
+    .procura__lista {
+      grid-column: 5 / span 8;
+    }
+
+    .procura__link {
+      padding-block: 2rem;
+    }
+  }
+</style>

@@ -1,0 +1,189 @@
+---
+import Icone from '../Icone.astro';
+import Pendente from '../Pendente.astro';
+---
+<section class="antes secao sobre-verde" aria-labelledby="titulo-antes" data-antes>
+  <span class="antes__leque-fundo" data-leque-fundo aria-hidden="true"><Icone nome="brilho" /></span>
+
+  <div class="envoltorio grade antes__grade">
+    <div class="antes__cabeca">
+      <h2 class="display antes__titulo" id="titulo-antes" data-revelar="linhas">Antes de começar</h2>
+      <p class="antes__intro" data-revelar="subir">
+        A acupuntura faz parte de um raciocínio médico. A decisão de usar, ou não, vem depois de entender a sua dor.
+      </p>
+    </div>
+
+    <div class="antes__trilha">
+      <span class="antes__linha" aria-hidden="true"><span class="antes__linha-cheia" data-desenhar></span></span>
+      <ol class="antes__passos">
+        <li class="antes__passo" data-acender>
+          <span class="antes__marca" aria-hidden="true"><Icone nome="faisca" /></span>
+          <span class="antes__ordem" aria-hidden="true">Primeiro</span>
+          <h3 class="antes__nome">A conversa</h3>
+          <p><Pendente motivo="confirmar com a Dra. Thaís">Como a dor começou, o que piora, o que você já tentou e quanto ela atrapalha a sua rotina.</Pendente></p>
+        </li>
+        <li class="antes__passo" data-acender>
+          <span class="antes__marca" aria-hidden="true"><Icone nome="faisca" /></span>
+          <span class="antes__ordem" aria-hidden="true">Depois</span>
+          <h3 class="antes__nome">O exame</h3>
+          <!-- Texto aprovado no carrossel 04 (dor cervical), adaptado. -->
+          <p>O exame físico procura a causa da dor e as estruturas envolvidas, e verifica sinais que pedem outra investigação.</p>
+        </li>
+        <li class="antes__passo" data-acender>
+          <span class="antes__marca" aria-hidden="true"><Icone nome="faisca" /></span>
+          <span class="antes__ordem" aria-hidden="true">Então</span>
+          <h3 class="antes__nome">A decisão</h3>
+          <p><Pendente motivo="confirmar com a Dra. Thaís">Se a acupuntura fizer sentido, o plano sai dessa avaliação e é revisto ao longo do acompanhamento.</Pendente></p>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap, reduzido } from '../../scripts/movimento';
+  const secao = document.querySelector<HTMLElement>('[data-antes]');
+  const fundo = secao?.querySelector('[data-leque-fundo]');
+  if (secao && fundo && !reduzido) {
+    gsap.fromTo(fundo, { rotate: -30, scale: 0.8 }, { rotate: 120, scale: 1.15, ease: 'none', scrollTrigger: { trigger: secao, start: 'top bottom', end: 'bottom top', scrub: true } });
+  }
+</script>
+
+<style>
+  .antes {
+    position: relative;
+    overflow: clip;
+  }
+
+  .antes__leque-fundo {
+    position: absolute;
+    right: -18vw;
+    top: 8%;
+    width: min(70vw, 52rem);
+    color: var(--sobre-verde);
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .antes__grade {
+    position: relative;
+    row-gap: 3rem;
+  }
+
+  .antes__cabeca {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
+  .antes__titulo {
+    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+  }
+
+  .antes__intro {
+    font-size: var(--t-lead);
+    line-height: 1.5;
+    color: var(--sobre-verde);
+    max-width: 30rem;
+  }
+
+  .antes__trilha {
+    position: relative;
+    grid-column: 1 / -1;
+    padding-left: 2.75rem;
+  }
+
+  .antes__linha {
+    position: absolute;
+    left: 0.7rem;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 1px;
+    background: var(--linha-sobre-verde);
+  }
+
+  .antes__linha-cheia {
+    position: absolute;
+    inset: 0;
+    background: var(--caramelo);
+  }
+
+  .antes__passos {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+
+  .antes__passo {
+    position: relative;
+    display: grid;
+    gap: 0.6rem;
+    opacity: 0.55;
+    transition: opacity 0.6s var(--curva-entrada);
+  }
+
+  :global(.sem-movimento) .antes__passo,
+  :global(html:not(.movimento)) .antes__passo,
+  .antes__passo:global(.aceso) {
+    opacity: 1;
+  }
+
+  .antes__marca {
+    position: absolute;
+    left: -2.75rem;
+    top: 0.1rem;
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--verde);
+    color: var(--caramelo);
+    transition: scale 0.6s var(--curva-entrada), rotate 0.6s var(--curva-entrada);
+  }
+
+  .antes__marca :global(.icone) {
+    width: 0.9rem;
+  }
+
+  .antes__passo:global(.aceso) .antes__marca {
+    scale: 1.6;
+    rotate: 90deg;
+  }
+
+  .antes__ordem {
+    font-family: var(--fonte-display);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--caramelo);
+  }
+
+  .antes__nome {
+    font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+    font-weight: 560;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--sobre-verde);
+  }
+
+  .antes__passo p {
+    color: var(--sobre-verde-suave);
+    max-width: 34rem;
+    font-size: var(--t-lead);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 64rem) {
+    .antes__cabeca {
+      grid-column: 1 / span 5;
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+    }
+
+    .antes__trilha {
+      grid-column: 7 / span 6;
+    }
+  }
+</style>

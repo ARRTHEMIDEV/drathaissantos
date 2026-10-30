@@ -1,0 +1,273 @@
+---
+import { getEntries, getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Foto from '../../components/Foto.astro';
+import Icone from '../../components/Icone.astro';
+import Seta from '../../components/Seta.astro';
+import { artigosVisiveis, estadoRevisao, nomesDosTemas, type Artigo } from '../../lib/artigos';
+import { modoPreview } from '../../lib/modo';
+import { profissional as p } from '../../data/profissional';
+import { fotos } from '../../data/fotos';
+import '../../styles/artigo.css';
+
+export async function getStaticPaths() {
+  const artigos = await artigosVisiveis();
+  return artigos.map((artigo) => ({ params: { slug: artigo.id }, props: { artigo } }));
+}
+
+const { artigo } = Astro.props as { artigo: Artigo };
+const d = artigo.data;
+const estado = estadoRevisao(artigo);
+const fontes = await getEntries(d.fontes);
+Astro.locals.fontesArtigo = d.fontes.map((f) => f.id);
+Astro.locals.contadorRef = 0;
+
+const { Content, headings } = await render(artigo);
+const secoes = headings.filter((h) => h.depth === 2);
+
+const proximoArtigo = d.proximo ? await getEntry(d.proximo) : undefined;
+const urlCanonica = new URL(`/artigos/${artigo.id}`, Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalWebPage',
+  name: d.titulo,
+  description: d.resumo,
+  url: urlCanonica,
+  inLanguage: 'pt-BR',
+  author: { '@type': 'Physician', name: p.nome, url: new URL('/sobre', Astro.site).href },
+  ...(estado.publicavel
+    ? {
+        lastReviewed: d.revisao.data,
+        reviewedBy: { '@type': 'Person', name: d.revisao.revisor },
+      }
+    : {}),
+  citation: fontes.map((f) => ({ '@type': 'ScholarlyArticle', name: f.data.titulo, url: f.data.url })),
+};
+
+const convites: Record<Artigo['data']['tema'], string> = {
+  enxaqueca: 'Se as crises estão atrapalhando sua rotina, uma avaliação ajuda a entender o que faz sentido no seu caso.',
+  cervical: 'Se a dor no pescoço continua voltando, uma avaliação ajuda a entender de onde ela vem.',
+  consulta: 'Se ficou alguma dúvida sobre o atendimento, a equipe responde pelo WhatsApp.',
+};
+
+const foto = {
+  src: d.capa,
+  alt: d.capaAlt,
+  foco: { desktop: d.capaFoco, celular: d.capaFoco },
+};
+---
+<Base titulo={d.titulo} descricao={d.resumo} tipo="article" jsonLd={jsonLd}>
+  {modoPreview && !estado.publicavel && (
+    <div class="aviso-revisao nao-imprimir" role="status">
+      <div class="envoltorio">
+        <strong>{estado.motivo}.</strong> Este texto aparece só no preview e não vai para o site público até a aprovação da Dra. Thaís.
+        Versão atual do texto: <code>{estado.versaoAtual}</code>
+      </div>
+    </div>
+  )}
+
+  <div class="progresso-leitura nao-imprimir" aria-hidden="true">
+    <span class="progresso-leitura__barra" data-progresso-leitura></span>
+  </div>
+
+  <div class="faixa-leitura nao-imprimir" data-faixa-leitura aria-hidden="true">
+    <div class="envoltorio faixa-leitura__linha">
+      <p class="faixa-leitura__titulo">{d.tituloCurto}</p>
+      {secoes.length > 1 && (
+        <>
+          <button type="button" class="faixa-leitura__botao" popovertarget="indice-faixa" tabindex="-1">Índice</button>
+          <nav class="indice-flutuante" id="indice-faixa" popover aria-label="Índice do artigo">
+            <ol>
+              {secoes.map((s) => <li><a href={`#${s.slug}`}>{s.text}</a></li>)}
+            </ol>
+          </nav>
+        </>
+      )}
+    </div>
+  </div>
+
+  <article class="artigo">
+    <header class="envoltorio artigo__cabecalho">
+      <nav class="artigo__trilha auxiliar" aria-label="Você está em">
+        <a class="link" href="/artigos">Artigos</a>
+        <span aria-hidden="true">/</span>
+        <span>{nomesDosTemas[d.tema]}</span>
+      </nav>
+      <h1 class="display artigo__titulo" data-titulo-artigo data-revelar="linhas">{d.titulo}</h1>
+      <div class="artigo__resumo" data-revelar="subir" data-atraso="0.3">
+        <p class="artigo__resumo-rotulo">Em resumo</p>
+        <p class="lead">{d.resumo}</p>
+      </div>
+      <p class="artigo__autoria auxiliar" data-revelar="subir" data-atraso="0.45">
+        Por <a class="link" href="/sobre">{p.nome}</a>, médica ({p.crm}, {p.rqe}).
+        {estado.publicavel ? <> Revisado em {d.revisao.data}.</> : <> Texto em revisão médica.</>}
+      </p>
+    </header>
+
+    <div class="envoltorio artigo__capa" data-capa-artigo>
+      <Foto foto={foto} proporcao="16 / 8" proporcaoCelular="4 / 3" sizes="(min-width: 80rem) 1280px, 100vw" prioridade transicao={`capa-${artigo.id}`} />
+    </div>
+
+    <div class="envoltorio artigo__miolo">
+      {secoes.length > 1 && (
+        <nav class="artigo__indice nao-imprimir" aria-label="Neste artigo">
+          <p class="artigo__indice-titulo">Neste artigo</p>
+          <ol>
+            {secoes.map((s) => <li><a class="link" href={`#${s.slug}`}>{s.text}</a></li>)}
+          </ol>
+        </nav>
+      )}
+
+      <div class="artigo__corpo">
+        <Content />
+      </div>
+      <script is:inline>
+        document.querySelectorAll('.artigo__corpo > h2').forEach(function (h) { h.setAttribute('data-revelar', 'linhas'); });
+        document.querySelectorAll('.artigo__corpo > .evidencia').forEach(function (b) { b.setAttribute('data-revelar', 'subir'); });
+      </script>
+
+      <section class="artigo__fontes" id="fontes" aria-labelledby="titulo-fontes">
+        <h2 class="titulo-texto" id="titulo-fontes">Fontes</h2>
+        <ol>
+          {fontes.map((f) => (
+            <li id={`fonte-${f.id}`}>
+              <span class="artigo__fonte-titulo">{f.data.titulo}</span>
+              <span class="auxiliar">{f.data.autores}. {f.data.publicacao}, {f.data.ano}. {f.data.tipo}.</span>
+              <a class="link" href={f.data.url} rel="noopener" target="_blank">{f.data.url.replace('https://', '')}</a>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="artigo__revisao" aria-labelledby="titulo-revisao">
+        <h2 class="titulo-texto" id="titulo-revisao">Revisão médica</h2>
+        {estado.publicavel ? (
+          <p>Texto revisado por {d.revisao.revisor} em {d.revisao.data}. Versão {estado.versaoAprovada}.</p>
+        ) : (
+          <p>Este texto ainda não foi aprovado pela Dra. Thaís Santos.</p>
+        )}
+        <p class="auxiliar">O conteúdo é informativo e não substitui a avaliação médica individual.</p>
+        <p class="auxiliar so-impressao">Endereço deste artigo: {urlCanonica}</p>
+        <div class="artigo__acoes nao-imprimir">
+          <button type="button" class="botao botao--contorno" data-imprimir>Imprimir</button>
+          <button type="button" class="botao botao--contorno" data-copiar={urlCanonica}>
+            <span data-copiar-rotulo>Copiar link</span>
+          </button>
+          <span class="artigo__acao-status auxiliar" role="status" data-copiar-status></span>
+        </div>
+      </section>
+    </div>
+  </article>
+
+  <aside class="fechamento nao-imprimir" aria-labelledby="titulo-fechamento">
+    <div class="envoltorio grade fechamento__grade">
+      <h2 class="fechamento__rotulo" id="titulo-fechamento">Para continuar</h2>
+      {proximoArtigo ? (
+        <a class="fechamento__item" href={`/artigos/${proximoArtigo.id}`}>
+          <Foto
+            foto={{ src: proximoArtigo.data.capa, alt: '', foco: { desktop: proximoArtigo.data.capaFoco, celular: proximoArtigo.data.capaFoco } }}
+            proporcao="3 / 4"
+            sizes="(min-width: 48rem) 30vw, 100vw"
+            class="fechamento__foto"
+            transicao={`capa-${proximoArtigo.id}`}
+          />
+          <span class="display fechamento__titulo">{proximoArtigo.data.titulo}</span>
+          <span class="fechamento__acao">Ler o artigo <Seta /></span>
+        </a>
+      ) : (
+        <a class="fechamento__item" href="/primeira-consulta">
+          <Foto foto={fotos.consultorio} alt="" proporcao="3 / 4" sizes="(min-width: 48rem) 30vw, 100vw" class="fechamento__foto" />
+          <span class="display fechamento__titulo">Como funciona a primeira consulta</span>
+          <span class="fechamento__acao">Ver as etapas <Seta /></span>
+        </a>
+      )}
+      <div class="fechamento__contato">
+        <Icone nome="leque" class="fechamento__leque" />
+        <p class="lead">{convites[d.tema]}</p>
+        <a class="botao" href="/agendar">Solicitar agendamento <Seta /></a>
+      </div>
+    </div>
+  </aside>
+</Base>
+
+<script>
+  import { gsap, reduzido } from '../../scripts/movimento';
+
+  // Progresso de leitura: uma linha com a faísca na ponta, amarrada ao corpo do texto.
+  const barra = document.querySelector('[data-progresso-leitura]');
+  if (barra && !reduzido) {
+    gsap.fromTo(barra, { scaleX: 0 }, { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '.artigo__corpo', start: 'top 30%', end: 'bottom 70%', scrub: 0.3 } });
+    const capa = document.querySelector('[data-capa-artigo] img');
+    if (capa) {
+      gsap.set(capa, { scale: 1.14 });
+      gsap.fromTo(capa, { yPercent: -5 }, { yPercent: 5, ease: 'none', scrollTrigger: { trigger: '[data-capa-artigo]', start: 'top bottom', end: 'bottom top', scrub: true } });
+    }
+  }
+
+  // Fichas de fonte: no celular (ou sem anchor positioning), abrem no fluxo do texto.
+  const fluxo = () =>
+    window.matchMedia('(max-width: 63.99rem)').matches || !CSS.supports('anchor-name: --a');
+
+  document.querySelectorAll<HTMLButtonElement>('.ref__botao').forEach((botao) => {
+    const ficha = document.getElementById(botao.dataset.ficha ?? '');
+    if (!ficha) return;
+    botao.setAttribute('aria-expanded', 'false');
+    botao.addEventListener('click', (evento) => {
+      if (!fluxo()) return;
+      evento.preventDefault();
+      const aberta = ficha.classList.toggle('ficha--no-fluxo');
+      botao.setAttribute('aria-expanded', String(aberta));
+    });
+    ficha.addEventListener('toggle', (e) => {
+      botao.setAttribute('aria-expanded', String((e as ToggleEvent).newState === 'open'));
+    });
+    ficha.querySelector<HTMLButtonElement>('[data-fechar-ficha]')?.addEventListener('click', (evento) => {
+      if (!ficha.classList.contains('ficha--no-fluxo')) return;
+      evento.preventDefault();
+      ficha.classList.remove('ficha--no-fluxo');
+      botao.setAttribute('aria-expanded', 'false');
+      botao.focus();
+    });
+    ficha.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && ficha.classList.contains('ficha--no-fluxo')) {
+        ficha.classList.remove('ficha--no-fluxo');
+        botao.setAttribute('aria-expanded', 'false');
+        botao.focus();
+      }
+    });
+  });
+
+  // Faixa compacta de leitura (desktop): aparece quando o título sai da tela.
+  const faixa = document.querySelector<HTMLElement>('[data-faixa-leitura]');
+  const titulo = document.querySelector('[data-titulo-artigo]');
+  if (faixa && titulo) {
+    new IntersectionObserver(([e]) => {
+      const mostrar = !e.isIntersecting && e.boundingClientRect.top < 0;
+      faixa.dataset.visivel = String(mostrar);
+      faixa.setAttribute('aria-hidden', String(!mostrar));
+      faixa.querySelectorAll('button').forEach((b) => (b.tabIndex = mostrar ? 0 : -1));
+    }).observe(titulo);
+    faixa.querySelectorAll('#indice-faixa a').forEach((a) =>
+      a.addEventListener('click', () => (document.getElementById('indice-faixa') as HTMLElement & { hidePopover(): void })?.hidePopover()),
+    );
+  }
+
+  document.querySelector('[data-imprimir]')?.addEventListener('click', () => window.print());
+
+  const copiar = document.querySelector<HTMLButtonElement>('[data-copiar]');
+  copiar?.addEventListener('click', async () => {
+    const rotulo = copiar.querySelector('[data-copiar-rotulo]');
+    const status = document.querySelector('[data-copiar-status]');
+    try {
+      await navigator.clipboard.writeText(copiar.dataset.copiar ?? location.href);
+      if (rotulo) rotulo.textContent = 'Link copiado';
+      if (status) status.textContent = 'O endereço do artigo foi copiado.';
+    } catch {
+      if (status) status.textContent = 'Não foi possível copiar. Selecione o endereço na barra do navegador.';
+    }
+    setTimeout(() => {
+      if (rotulo) rotulo.textContent = 'Copiar link';
+    }, 2600);
+  });
+</script>

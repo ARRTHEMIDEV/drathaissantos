@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Pendente from '../components/Pendente.astro';
+import { profissional as p } from '../data/profissional';
+---
+<Base titulo="Privacidade" descricao="Como o site da Dra. Thaís Santos trata dados de quem visita.">
+  <article class="envoltorio privacidade secao">
+    <h1 class="display">Privacidade</h1>
+    <p class="lead"><Pendente motivo="texto final a revisar juridicamente; descreve o funcionamento previsto para o lançamento">Este site foi feito para coletar o mínimo de dados possível.</Pendente></p>
+
+    <h2 class="titulo-texto">O que é medido</h2>
+    <p>
+      Usamos o Cloudflare Web Analytics para contar visitas de forma agregada: quantas pessoas acessaram cada página e de onde vieram.
+      Ele não usa cookies e não cria um perfil de quem visita.
+    </p>
+
+    <h2 class="titulo-texto">Contato pelo WhatsApp</h2>
+    <p>
+      O botão “Solicitar agendamento” passa pela página /agendar, que só é contada como visita, e abre uma conversa no WhatsApp do consultório.
+      A partir daí, a conversa segue as regras do WhatsApp e o atendimento do consultório.
+      O site não envia ao WhatsApp nenhuma informação sobre as páginas que você leu.
+    </p>
+
+    <h2 class="titulo-texto">O que não fazemos</h2>
+    <p>Não usamos anúncios, remarketing, gravação de sessão nem formulários que peçam informações de saúde.</p>
+
+    <h2 class="titulo-texto">Responsável</h2>
+    <p>{p.nome}, {p.crm}. <Pendente motivo="canal para pedidos sobre dados pessoais (e-mail)" /></p>
+  </article>
+</Base>
+
+<style>
+  .privacidade {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 46rem;
+  }
+  .privacidade h2 {
+    margin-top: 1.5rem;
+  }
+</style>

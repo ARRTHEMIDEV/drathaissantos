@@ -1,0 +1,341 @@
+---
+import Foto from '../Foto.astro';
+import Icone from '../Icone.astro';
+import Seta from '../Seta.astro';
+import Pendente from '../Pendente.astro';
+import Faiscas from '../fx/Faiscas.astro';
+import Selo from '../fx/Selo.astro';
+import { fotos } from '../../data/fotos';
+import { profissional as p } from '../../data/profissional';
+---
+<section class="abertura" aria-labelledby="titulo-abertura" data-abertura-cena>
+  <Faiscas tom="caramelo" densidade={1.1} />
+
+  <div class="envoltorio grade abertura__grade">
+    <div class="abertura__texto">
+      <h1 class="display abertura__titulo" id="titulo-abertura" data-revelar="linhas" data-intro>
+        <span>Antes de</span> <span>qualquer</span> <span>agulha, vem</span> <span>a avaliação.</span>
+      </h1>
+      <p class="abertura__quem" data-revelar="subir" data-intro data-atraso="0.35">
+        <strong>{p.nome}</strong>
+        <span>{p.especialidade}, em {p.cidade}.</span>
+      </p>
+      <div class="abertura__acoes" data-revelar="subir" data-intro data-atraso="0.5">
+        <a class="botao botao--grande" href="/agendar" data-magnetico="0.25">Solicitar agendamento <Seta /></a>
+        <a class="link" href="/primeira-consulta">Como funciona a primeira consulta</a>
+      </div>
+      <p class="abertura__registro auxiliar" data-revelar="subir" data-intro data-atraso="0.65">Médica, {p.crm}, {p.rqe}</p>
+    </div>
+
+    <div class="abertura__retrato">
+      <span class="abertura__leque" data-leque><Icone nome="leque" /></span>
+      <div class="abertura__moldura" data-moldura>
+        <Foto
+          foto={fotos.retratoAbertura}
+          fotoCelular={fotos.retratoAberturaCelular}
+          proporcao="4 / 5"
+          proporcaoCelular="3 / 2"
+          sizes="(min-width: 64rem) 46vw, 100vw"
+          prioridade
+          class="abertura__foto"
+        />
+        <span class="abertura__veu" data-veu aria-hidden="true"></span>
+      </div>
+
+      <figure class="abertura__detalhe" data-detalhe>
+        <Foto foto={fotos.agulhaDetalhe} proporcao="4 / 5" sizes="(min-width: 64rem) 14vw, 1px" class="abertura__detalhe-foto" />
+        <figcaption class="auxiliar">
+          <Pendente motivo="legenda a aprovar">A agulha de acupuntura é fina, estéril e de uso único.</Pendente>
+        </figcaption>
+      </figure>
+
+      <div class="abertura__selo" data-selo>
+        <Selo tom="verde" />
+      </div>
+    </div>
+  </div>
+
+  <a class="abertura__rolar" href="#titulo-procura" aria-label="Ir para a próxima seção">
+    <span>Role</span>
+    <span class="abertura__rolar-linha" aria-hidden="true"></span>
+  </a>
+  <span class="abertura__fim" data-fim-abertura aria-hidden="true"></span>
+</section>
+
+<script>
+  import { gsap, ScrollTrigger, introFim, reduzido } from '../../scripts/movimento';
+
+  const cena = document.querySelector<HTMLElement>('[data-abertura-cena]');
+  if (cena && !reduzido) {
+    const veu = cena.querySelector<HTMLElement>('[data-veu]');
+    const moldura = cena.querySelector<HTMLElement>('[data-moldura]');
+    const img = moldura?.querySelector('img');
+    const leque = cena.querySelector<HTMLElement>('[data-leque]');
+    const detalhe = cena.querySelector<HTMLElement>('[data-detalhe]');
+    const selo = cena.querySelector<HTMLElement>('[data-selo]');
+    const desktop = window.matchMedia('(min-width: 64rem)').matches;
+
+    gsap.set(img ?? [], { scale: 1.28 });
+    gsap.set(leque, { clipPath: 'circle(0% at 50% 100%)', rotate: -40 });
+    gsap.set(detalhe, { autoAlpha: 0, y: 90, rotate: -6 });
+    gsap.set(selo, { scale: 0, rotate: -120 });
+
+    introFim.then(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+      tl.to(veu, { yPercent: -101, duration: 1.5, ease: 'expo.inOut' }, 0)
+        .to(img ?? [], { scale: 1.1, duration: 2.2 }, 0.2)
+        .to(leque, { clipPath: 'circle(120% at 50% 100%)', rotate: 0, duration: 1.4, ease: 'power3.out' }, 0.8)
+        .to(detalhe, { autoAlpha: 1, y: 0, rotate: 0, duration: 1.4 }, 1)
+        .to(selo, { scale: 1, rotate: 0, duration: 1.3, ease: 'back.out(1.6)' }, 1.15);
+
+      // Depois da entrada, a rolagem cria profundidade: cada camada em uma velocidade.
+      tl.add(() => {
+        const rolagem = { trigger: cena, start: 'top top', end: 'bottom top', scrub: true } as const;
+        gsap.to(img ?? [], { yPercent: 9, ease: 'none', scrollTrigger: rolagem });
+        gsap.to(leque, { rotate: 75, y: -60, ease: 'none', scrollTrigger: rolagem });
+        if (desktop) {
+          gsap.to(detalhe, { y: -170, ease: 'none', scrollTrigger: rolagem });
+          gsap.to(selo, { y: -90, rotate: 140, ease: 'none', scrollTrigger: rolagem });
+          gsap.fromTo(moldura, { clipPath: 'inset(0% 6% 0% 6% round 3px)' }, { clipPath: 'inset(0% 0% 0% 0% round 3px)', ease: 'none', scrollTrigger: rolagem });
+          gsap.to('.abertura__texto', { y: -80, ease: 'none', scrollTrigger: rolagem });
+        }
+        ScrollTrigger.refresh();
+      });
+    });
+  }
+</script>
+
+<style>
+  .abertura {
+    position: relative;
+    padding-top: 0.5rem;
+    overflow: clip;
+  }
+
+  .abertura__grade {
+    position: relative;
+    z-index: 1;
+    row-gap: 1.75rem;
+  }
+
+  .abertura__retrato {
+    position: relative;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-inline: calc(var(--margem) * -1);
+  }
+
+  .abertura__moldura {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .abertura__veu {
+    position: absolute;
+    inset: 0;
+    background: var(--papel);
+    display: none;
+  }
+
+  :global(.movimento:not(.sem-movimento)) .abertura__veu {
+    display: block;
+  }
+
+  .abertura__texto {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .abertura__titulo {
+    font-size: var(--t-h1);
+    line-height: 0.98;
+    text-wrap: initial;
+  }
+
+  .abertura__titulo span {
+    white-space: nowrap;
+  }
+
+  .abertura__quem {
+    display: grid;
+    gap: 0.1rem;
+    font-size: var(--t-lead);
+    line-height: 1.4;
+  }
+
+  .abertura__quem strong {
+    font-weight: 680;
+    color: var(--verde);
+  }
+
+  .abertura__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .abertura__registro {
+    font-size: var(--t-auxiliar);
+  }
+
+  .abertura__leque,
+  .abertura__detalhe,
+  .abertura__selo,
+  .abertura__rolar {
+    display: none;
+  }
+
+  .abertura__fim {
+    display: block;
+    height: 1px;
+  }
+
+  @media (max-width: 47.99rem) {
+    .abertura__titulo span {
+      display: inline;
+    }
+
+    /* O botão de agendamento precisa caber na primeira tela, mesmo em
+       celulares de 640px de altura: a foto cede altura em telas curtas. */
+    .abertura__grade {
+      row-gap: 1.25rem;
+    }
+
+    .abertura__texto {
+      gap: 1rem;
+    }
+
+    :global(.abertura__foto) {
+      display: block;
+      width: 100%;
+      aspect-ratio: auto;
+      height: min(66.67vw, 30svh);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .abertura {
+      min-height: calc(100svh - 5.75rem);
+      padding-top: clamp(1rem, 3vw, 3rem);
+      padding-bottom: 9rem;
+    }
+
+    .abertura__grade {
+      grid-template-rows: auto 1fr;
+      row-gap: 0;
+    }
+
+    .abertura__texto {
+      grid-column: 1 / span 5;
+      grid-row: 1;
+      align-self: start;
+      gap: 1.75rem;
+      padding-top: clamp(1rem, 4vw, 4.5rem);
+    }
+
+    .abertura__titulo span {
+      display: block;
+    }
+
+    .abertura__retrato {
+      grid-column: 7 / span 6;
+      grid-row: 1 / span 2;
+      margin: 0;
+    }
+
+    .abertura__moldura {
+      border-radius: var(--raio);
+      clip-path: inset(0% 6% 0% 6% round 3px);
+    }
+
+    .abertura__leque {
+      display: block;
+      position: absolute;
+      z-index: 2;
+      left: -2.5rem;
+      top: 2.5rem;
+      width: 8rem;
+      color: var(--caramelo);
+      transform-origin: 50% 100%;
+    }
+
+    .abertura__detalhe {
+      display: grid;
+      gap: 0.6rem;
+      position: absolute;
+      z-index: 2;
+      left: clamp(-7rem, -5vw, -4.5rem);
+      bottom: -6rem;
+      width: clamp(9rem, 11vw, 11.5rem);
+    }
+
+    :global(.abertura__detalhe-foto) {
+      border-radius: var(--raio);
+      box-shadow: 0 0 0 0.6rem var(--papel), 0 30px 60px -30px rgb(18 39 27 / 0.45);
+    }
+
+    .abertura__selo {
+      display: block;
+      position: absolute;
+      z-index: 2;
+      right: -1.5rem;
+      bottom: 3rem;
+    }
+
+    .abertura__rolar {
+      position: absolute;
+      left: var(--margem);
+      bottom: 2rem;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: var(--t-auxiliar);
+      font-weight: 600;
+      color: var(--tinta-suave);
+      text-decoration: none;
+    }
+
+    .abertura__rolar-linha {
+      position: relative;
+      width: 4.5rem;
+      height: 1px;
+      overflow: hidden;
+      background: var(--linha);
+    }
+
+    .abertura__rolar-linha::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--caramelo);
+      animation: rolar 2.2s var(--curva-entrada) infinite;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .abertura__rolar {
+      left: calc((100vw - var(--largura-max)) / 2);
+    }
+  }
+
+  @keyframes rolar {
+    0% {
+      translate: -100% 0;
+    }
+    60%,
+    100% {
+      translate: 100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .abertura__moldura {
+      clip-path: none;
+    }
+  }
+</style>

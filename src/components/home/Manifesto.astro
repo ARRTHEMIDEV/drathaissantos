@@ -1,0 +1,59 @@
+---
+import Icone from '../Icone.astro';
+---
+<section class="manifesto secao" aria-label="Como a Dra. Thaís pensa o atendimento">
+  <div class="envoltorio grade manifesto__grade">
+    <Icone nome="faiscas-tres" class="manifesto__icone" />
+    <p class="manifesto__texto" data-revelar="palavras">
+      Dor que volta, crise que atrapalha o mês, pescoço que não melhora. Cada uma dessas histórias começa por uma conversa e um exame.
+      É assim que a acupuntura entra no cuidado: como parte de um raciocínio médico, decidido com você.
+    </p>
+    <p class="manifesto__assinatura">Dra. Thaís Santos</p>
+  </div>
+</section>
+
+<style>
+  .manifesto {
+    padding-block: calc(var(--secao) * 1.1);
+  }
+
+  .manifesto__grade {
+    row-gap: 2rem;
+  }
+
+  .manifesto :global(.manifesto__icone) {
+    grid-column: 1 / -1;
+    width: 4.5rem;
+    color: var(--caramelo);
+  }
+
+  .manifesto__texto {
+    grid-column: 1 / -1;
+    font-size: clamp(1.75rem, 1rem + 3.1vw, 4rem);
+    font-weight: 500;
+    line-height: 1.16;
+    letter-spacing: -0.03em;
+    color: var(--verde);
+    text-wrap: pretty;
+  }
+
+  .manifesto__assinatura {
+    grid-column: 1 / -1;
+    font-family: var(--fonte-display);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--caramelo-texto);
+  }
+
+  @media (min-width: 64rem) {
+    .manifesto :global(.manifesto__icone) {
+      grid-column: 2 / span 2;
+    }
+    .manifesto__texto {
+      grid-column: 2 / span 10;
+    }
+    .manifesto__assinatura {
+      grid-column: 2 / span 6;
+    }
+  }
+</style>

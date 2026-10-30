@@ -1,0 +1,46 @@
+---
+// Bloco editorial de evidência. Responde às cinco perguntas do briefing.
+// O limite que muda a interpretação fica sempre visível, junto do resultado.
+// Sem notas, estrelas ou percentuais de certeza inventados.
+import { getEntry } from 'astro:content';
+import Icone from '../Icone.astro';
+
+interface Props {
+  titulo: string;
+  estudado: string;
+  pessoas: string;
+  resultado: string;
+  limite: string;
+  fonte: string;
+}
+const { titulo, estudado, pessoas, resultado, limite, fonte } = Astro.props;
+const entrada = await getEntry('fontes', fonte);
+if (!entrada) throw new Error(`Fonte "${fonte}" não encontrada`);
+const lista = Astro.locals.fontesArtigo ?? [];
+const numero = lista.indexOf(fonte) + 1;
+---
+<section class="evidencia" aria-label={titulo}>
+  <h3 class="evidencia__titulo">{titulo}</h3>
+  <dl class="evidencia__lista">
+    <div class="evidencia__linha">
+      <dt>O que foi estudado</dt>
+      <dd>{estudado}</dd>
+    </div>
+    <div class="evidencia__linha">
+      <dt>Em quem e com qual comparação</dt>
+      <dd>{pessoas}</dd>
+    </div>
+    <div class="evidencia__linha evidencia__linha--resultado">
+      <dt>O que se observou</dt>
+      <dd>{resultado}</dd>
+    </div>
+    <div class="evidencia__linha evidencia__linha--limite">
+      <dt><Icone nome="faisca" class="evidencia__marca" />O limite que muda a leitura</dt>
+      <dd>{limite}</dd>
+    </div>
+    <div class="evidencia__linha">
+      <dt>Fonte</dt>
+      <dd><a class="link" href={`#fonte-${fonte}`}>{numero > 0 ? `${numero}. ` : ''}{entrada.data.citacao}</a></dd>
+    </div>
+  </dl>
+</section>

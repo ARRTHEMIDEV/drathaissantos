@@ -1,0 +1,178 @@
+---
+import Base from '../layouts/Base.astro';
+import Foto from '../components/Foto.astro';
+import Icone from '../components/Icone.astro';
+import Seta from '../components/Seta.astro';
+import Pendente from '../components/Pendente.astro';
+import { fotos } from '../data/fotos';
+import { profissional as p } from '../data/profissional';
+---
+<Base
+  titulo="A médica"
+  descricao="Dra. Thaís Santos, médica formada pela UFMG, especialista em Acupuntura (CRM-MG 80240, RQE 60876), com consultório particular em Belo Horizonte."
+>
+  <section class="envoltorio grade medica secao">
+    <div class="medica__texto">
+      <h1 class="display medica__titulo" data-revelar="linhas">{p.nome}</h1>
+      <p class="lead" data-revelar="subir" data-atraso="0.3">
+        {p.especialidade}, em {p.cidade}. Atende em consultório particular desde 2024.
+      </p>
+      <p><Pendente motivo="apresentação nas palavras dela: por que escolheu a Acupuntura e como pensa o atendimento" /></p>
+    </div>
+    <figure class="medica__retrato" data-revelar="imagem">
+      <Foto foto={fotos.cartao} proporcao="4 / 5" sizes="(min-width: 64rem) 36vw, 100vw" prioridade />
+    </figure>
+  </section>
+
+  <section class="formacao secao sobre-verde" aria-labelledby="titulo-formacao">
+    <div class="envoltorio grade formacao__grade">
+      <h2 class="display formacao__titulo" id="titulo-formacao" data-revelar="linhas">Formação</h2>
+      <ol class="formacao__lista" data-revelar="subir" data-revelar-filhos>
+        {p.formacao.map((item) => (
+          <li>
+            <Icone nome="faisca" class="formacao__marca" />
+            <span class="formacao__periodo">{item.periodo ?? ''}</span>
+            <span class="formacao__texto">{item.texto}</span>
+          </li>
+        ))}
+      </ol>
+      <p class="formacao__nota auxiliar">
+        Informações do currículo enviado ao projeto. <Pendente motivo="conferir se continuam atuais antes de publicar" />
+      </p>
+    </div>
+  </section>
+
+  <section class="envoltorio grade registro secao" aria-labelledby="titulo-registro">
+    <h2 class="display registro__titulo" id="titulo-registro" data-revelar="linhas">Registro profissional</h2>
+    <div class="registro__texto">
+      <dl class="registro__lista">
+        <div><dt>Conselho Regional de Medicina</dt><dd>{p.crm}</dd></div>
+        <div><dt>Registro de Qualificação de Especialista</dt><dd>{p.areaRqe}, {p.rqe}</dd></div>
+      </dl>
+      <p>Qualquer pessoa pode conferir o registro e a especialidade de um médico no portal do Conselho Federal de Medicina.</p>
+      <a class="botao botao--contorno" href={p.buscaCfm} rel="noopener" target="_blank">Consultar no portal do CFM <Seta /></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .medica {
+    row-gap: 2.5rem;
+  }
+
+  .medica__texto {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.5rem;
+    align-content: center;
+  }
+
+  .medica__titulo {
+    font-size: clamp(2.75rem, 1.2rem + 5.4vw, 6.5rem);
+  }
+
+  .medica__retrato {
+    grid-column: 1 / -1;
+  }
+
+  .medica__retrato :global(.foto) {
+    border-radius: var(--raio);
+  }
+
+  .formacao__grade {
+    row-gap: 2rem;
+  }
+
+  .formacao__titulo,
+  .formacao__lista,
+  .formacao__nota {
+    grid-column: 1 / -1;
+  }
+
+  .formacao__lista li {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    padding: 1.25rem 0 1.25rem 2rem;
+    border-top: 1px solid var(--linha-sobre-verde);
+  }
+
+  .formacao__lista :global(.formacao__marca) {
+    position: absolute;
+    left: 0;
+    top: 1.6rem;
+    width: 0.8rem;
+    color: var(--caramelo);
+  }
+
+  .formacao__periodo {
+    font-size: var(--t-pequeno);
+    font-weight: 650;
+    color: var(--sobre-verde-suave);
+  }
+
+  .formacao__texto {
+    font-size: var(--t-lead);
+    line-height: 1.4;
+  }
+
+  .registro {
+    row-gap: 2rem;
+  }
+
+  .registro__titulo,
+  .registro__texto {
+    grid-column: 1 / -1;
+  }
+
+  .registro__texto {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    max-width: 38rem;
+  }
+
+  .registro__lista {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .registro__lista dt {
+    font-size: var(--t-pequeno);
+    font-weight: 650;
+    color: var(--tinta-suave);
+  }
+
+  .registro__lista dd {
+    margin: 0;
+    font-size: var(--t-lead);
+    font-weight: 620;
+    color: var(--verde);
+  }
+
+  @media (min-width: 64rem) {
+    .medica__texto {
+      grid-column: 1 / span 6;
+    }
+    .medica__retrato {
+      grid-column: 8 / span 5;
+    }
+    .formacao__titulo {
+      grid-column: 1 / span 4;
+    }
+    .formacao__lista,
+    .formacao__nota {
+      grid-column: 6 / span 7;
+    }
+    .formacao__lista li {
+      grid-template-columns: 8rem minmax(0, 1fr);
+      column-gap: 1.5rem;
+    }
+    .registro__titulo {
+      grid-column: 1 / span 5;
+    }
+    .registro__texto {
+      grid-column: 7 / span 6;
+    }
+  }
+</style>
