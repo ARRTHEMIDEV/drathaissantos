@@ -150,6 +150,28 @@ import { profissional as p } from '../data/profissional';
     color: var(--verde);
   }
 
+  @media (max-width: 47.99rem) {
+    .medica {
+      row-gap: 2rem;
+    }
+
+    .medica__texto {
+      gap: 1.1rem;
+    }
+
+    .medica__titulo {
+      font-size: var(--t-pagina);
+    }
+
+    .formacao__lista li {
+      padding-block: 1rem;
+    }
+
+    .formacao__lista :global(.formacao__marca) {
+      top: 1.3rem;
+    }
+  }
+
   @media (min-width: 64rem) {
     .medica__texto {
       grid-column: 1 / span 6;

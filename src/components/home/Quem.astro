@@ -89,7 +89,7 @@ const marcos = p.formacao.filter((f) => f.periodo);
   }
 
   .quem__titulo {
-    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+    font-size: var(--t-secao);
   }
 
   .quem__texto .lead {
@@ -208,6 +208,48 @@ const marcos = p.formacao.filter((f) => f.periodo);
     .quem__ponto {
       left: -1.95rem;
       top: 0.25rem;
+    }
+  }
+
+  /* No celular o arco fica mais estreito e encostado à esquerda; o selo
+     ocupa a sobra à direita, sobre a borda da foto. */
+  @media (max-width: 47.99rem) {
+    .quem__grade {
+      row-gap: 2rem;
+    }
+
+    .quem__arco {
+      width: 82%;
+    }
+
+    .quem__selo {
+      right: 0;
+      bottom: 3.25rem;
+    }
+
+    .quem__selo :global(.selo) {
+      width: 6.25rem;
+    }
+
+    .quem__texto {
+      gap: 1.25rem;
+    }
+
+    .quem__passagem {
+      padding-left: 1.6rem;
+      font-size: var(--t-corpo);
+    }
+
+    .quem__passagem :global(.quem__aspas) {
+      width: 0.85rem;
+    }
+
+    .quem__ano {
+      font-size: 1.25rem;
+    }
+
+    .quem__links {
+      gap: 1rem 1.5rem;
     }
   }
 

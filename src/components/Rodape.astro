@@ -183,6 +183,40 @@ const ano = new Date().getFullYear();
     margin-bottom: -0.6vw;
   }
 
+  @media (max-width: 47.99rem) {
+    .rodape {
+      padding-top: 3rem;
+    }
+
+    .rodape__grade {
+      row-gap: 2rem;
+    }
+
+    .rodape__marca {
+      gap: 0.9rem;
+    }
+
+    .rodape :global(.rodape__faiscas) {
+      width: 4.5rem;
+    }
+
+    .rodape__frase {
+      font-size: 1.25rem;
+    }
+
+    .rodape__bloco {
+      gap: 0.45rem;
+    }
+
+    .rodape__bloco .link {
+      justify-self: start;
+    }
+
+    .rodape__gigante {
+      margin-top: 2rem;
+    }
+  }
+
   @media (min-width: 48rem) {
     .rodape__marca {
       grid-column: 1 / span 4;

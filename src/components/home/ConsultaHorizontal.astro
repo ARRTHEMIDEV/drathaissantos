@@ -1,7 +1,8 @@
 ---
 // A primeira consulta em rolagem horizontal: no desktop a seção fica fixa e os
-// capítulos correm para o lado conforme a rolagem; no celular vira um
-// carrossel com encaixe. A ordem de leitura do HTML é a mesma da história.
+// capítulos correm para o lado conforme a rolagem; no celular o título fica
+// acima e só os cartões deslizam, com as faíscas marcando a etapa. A ordem de
+// leitura do HTML é a mesma da história.
 import Foto from '../Foto.astro';
 import Icone from '../Icone.astro';
 import Seta from '../Seta.astro';
@@ -9,6 +10,21 @@ import Pendente from '../Pendente.astro';
 import { etapasConsulta } from '../../data/consulta';
 ---
 <section class="horizontal sobre-papel-claro" aria-labelledby="titulo-horizontal" data-horizontal>
+  <!-- Cabeça só do celular: o título não desliza junto com os cartões. -->
+  <div class="envoltorio horizontal__cabeca">
+    <h2 class="display horizontal__titulo" data-revelar="linhas">A primeira consulta</h2>
+    <p class="lead">Um encontro para entender a dor antes de decidir qualquer tratamento.</p>
+    <p class="auxiliar"><Pendente motivo="sequência a confirmar com a rotina real" /></p>
+    <div class="horizontal__guia" aria-hidden="true">
+      <span class="horizontal__progresso">
+        {etapasConsulta.map(() => (
+          <span class="horizontal__passo" data-horizontal-passo-celular><Icone nome="faisca" /></span>
+        ))}
+      </span>
+      <span class="auxiliar">Deslize para o lado</span>
+    </div>
+  </div>
+
   <div class="horizontal__trilho" data-horizontal-trilho>
     <div class="horizontal__intro">
       <h2 class="display horizontal__titulo" id="titulo-horizontal">A primeira consulta</h2>
@@ -23,7 +39,7 @@ import { etapasConsulta } from '../../data/consulta';
     </div>
 
     {etapasConsulta.map((etapa, i) => (
-      <article class="horizontal__cartao" aria-labelledby={`horizontal-${etapa.id}`}>
+      <article class="horizontal__cartao" aria-labelledby={`horizontal-${etapa.id}`} data-horizontal-cartao={i}>
         <div class="horizontal__foto">
           <Foto foto={etapa.foto} proporcao="4 / 5" sizes="(min-width: 64rem) 30vw, 80vw" />
         </div>
@@ -41,6 +57,25 @@ import { etapasConsulta } from '../../data/consulta';
     </div>
   </div>
 </section>
+
+<script>
+  // Celular: a faísca da etapa acende quando o cartão dela ocupa o trilho.
+  const trilho = document.querySelector<HTMLElement>('[data-horizontal-trilho]');
+  const passos = [...document.querySelectorAll<HTMLElement>('[data-horizontal-passo-celular]')];
+  const cartoes = [...document.querySelectorAll<HTMLElement>('[data-horizontal-cartao]')];
+  if (trilho && passos.length && window.matchMedia('(max-width: 47.99rem)').matches) {
+    const acender = (ativo: number) => passos.forEach((p, i) => p.classList.toggle('aceso', i <= ativo));
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) acender(Number((e.target as HTMLElement).dataset.horizontalCartao));
+        });
+      },
+      { root: trilho, threshold: 0.6 },
+    );
+    cartoes.forEach((c) => observador.observe(c));
+  }
+</script>
 
 <style>
   .horizontal {
@@ -72,7 +107,11 @@ import { etapasConsulta } from '../../data/consulta';
   }
 
   .horizontal__titulo {
-    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+    font-size: var(--t-secao);
+  }
+
+  .horizontal__cabeca {
+    display: none;
   }
 
   .horizontal__progresso {
@@ -170,6 +209,70 @@ import { etapasConsulta } from '../../data/consulta';
 
   .horizontal__circulo :global(.seta) {
     width: 1.5rem;
+  }
+
+  @media (max-width: 47.99rem) {
+    .horizontal {
+      padding-top: var(--secao);
+    }
+
+    .horizontal__cabeca {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .horizontal__intro {
+      display: none;
+    }
+
+    .horizontal__guia {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .horizontal__trilho {
+      gap: 1rem;
+      padding: 1.75rem var(--margem) var(--secao);
+    }
+
+    .horizontal__cartao {
+      flex: 0 0 min(72vw, 18rem);
+      gap: 0.4rem;
+    }
+
+    .horizontal__foto :global(.foto) {
+      aspect-ratio: 1;
+    }
+
+    .horizontal__numero {
+      top: -0.32em;
+      font-size: 4rem;
+      -webkit-text-stroke-width: 1.25px;
+    }
+
+    .horizontal__nome {
+      font-size: var(--t-item);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .horizontal__fim {
+      flex: 0 0 min(56vw, 14rem);
+    }
+
+    .horizontal__circulo {
+      width: 9rem;
+      gap: 0.5rem;
+      padding: 1.25rem;
+      font-size: var(--t-pequeno);
+    }
+
+    .horizontal__circulo :global(.seta) {
+      width: 1.2rem;
+    }
   }
 
   @media (min-width: 64rem) {

@@ -122,6 +122,47 @@ import { profissional as p } from '../../data/profissional';
     border-top: 1px solid var(--linha-sobre-verde);
   }
 
+  @media (max-width: 47.99rem) {
+    .encerramento {
+      padding-block: calc(var(--secao) * 1.15) var(--secao);
+    }
+
+    .encerramento__grade {
+      row-gap: 1.5rem;
+    }
+
+    .encerramento :global(.encerramento__faiscas) {
+      width: 5.5rem;
+    }
+
+    .encerramento__titulo {
+      font-size: clamp(2.125rem, 1.4rem + 3vw, 2.625rem);
+      line-height: 0.98;
+    }
+
+    .encerramento__texto {
+      gap: 1.5rem;
+    }
+
+    .encerramento__botao {
+      gap: 1rem;
+      padding: 0.45rem 0.45rem 0.45rem 1.5rem;
+      font-size: 1rem;
+    }
+
+    .encerramento__botao-icone {
+      width: 2.9rem;
+    }
+
+    .encerramento__botao-icone :global(.seta) {
+      width: 1.15rem;
+    }
+
+    .encerramento__local {
+      padding-top: 1.25rem;
+    }
+  }
+
   @media (min-width: 64rem) {
     .encerramento__titulo {
       grid-column: 1 / span 10;

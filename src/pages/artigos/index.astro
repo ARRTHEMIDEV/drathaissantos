@@ -54,7 +54,7 @@ const artigos = await artigosVisiveis();
   }
 
   .biblioteca__titulo {
-    font-size: clamp(2.5rem, 1.2rem + 4.8vw, 6rem);
+    font-size: var(--t-pagina);
   }
 
   .biblioteca__lista {
@@ -111,6 +111,20 @@ const artigos = await artigosVisiveis();
   .biblioteca__item:hover :global(.seta),
   .biblioteca__item:focus-visible :global(.seta) {
     translate: 3px 0;
+  }
+
+  @media (max-width: 47.99rem) {
+    .biblioteca {
+      row-gap: 2rem;
+    }
+
+    .biblioteca__lista {
+      gap: 2.25rem;
+    }
+
+    .biblioteca__nome {
+      font-size: 1.375rem;
+    }
   }
 
   @media (min-width: 64rem) {

@@ -180,6 +180,56 @@ const itens = [
     rotate: -45deg;
   }
 
+  /* Sem ponteiro, o toque mostra o mesmo retorno da linha ativa. */
+  .procura__link:active::before {
+    transform: scaleY(1);
+  }
+
+  .procura__link:active .procura__circulo {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--sobre-verde);
+    rotate: -45deg;
+  }
+
+  @media (max-width: 47.99rem) {
+    .procura__envoltorio {
+      gap: 1.75rem;
+    }
+
+    .procura__cabeca {
+      gap: 0.6rem;
+    }
+
+    .procura__titulo {
+      font-size: var(--t-secao);
+    }
+
+    .procura__link {
+      padding: 1.1rem 0;
+      row-gap: 0.2rem;
+    }
+
+    .procura__nome {
+      font-size: var(--t-item);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .procura__linha {
+      line-height: 1.4;
+    }
+
+    .procura__circulo {
+      width: 2.5rem;
+    }
+
+    .procura__circulo :global(.seta) {
+      width: 1rem;
+    }
+  }
+
   @media (min-width: 64rem) {
     .procura__envoltorio {
       grid-template-columns: repeat(12, minmax(0, 1fr));

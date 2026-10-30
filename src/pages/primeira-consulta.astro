@@ -172,7 +172,7 @@ import { etapasConsulta } from '../data/consulta';
   }
 
   .consulta-topo__titulo {
-    font-size: clamp(2.5rem, 1.2rem + 4.8vw, 6rem);
+    font-size: var(--t-pagina);
     max-width: 12ch;
   }
 
@@ -278,6 +278,36 @@ import { etapasConsulta } from '../data/consulta';
     line-height: 1.2;
     letter-spacing: -0.02em;
     color: var(--verde);
+  }
+
+  @media (max-width: 47.99rem) {
+    .consulta-topo {
+      row-gap: 1.75rem;
+    }
+
+    .consulta-topo__texto {
+      gap: 1rem;
+    }
+
+    .consulta-topo__numero {
+      font-size: 1.25rem;
+    }
+
+    .cenas__capitulos {
+      gap: 2.5rem;
+    }
+
+    .cenas__capitulo {
+      gap: 0.6rem;
+    }
+
+    .cenas__numero {
+      font-size: 1.75rem;
+    }
+
+    .cenas__titulo {
+      font-size: 1.375rem;
+    }
   }
 
   @media (min-width: 64rem) {

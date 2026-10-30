@@ -195,8 +195,10 @@ import { profissional as p } from '../../data/profissional';
   }
 
   @media (max-width: 47.99rem) {
+    /* Uma frase por linha, como no desktop: a primeira linha fica curta e
+       deixa o canto direito livre para o selo. */
     .abertura__titulo span {
-      display: inline;
+      display: block;
     }
 
     /* O botão de agendamento precisa caber na primeira tela, mesmo em
@@ -214,6 +216,35 @@ import { profissional as p } from '../../data/profissional';
       width: 100%;
       aspect-ratio: auto;
       height: min(66.67vw, 30svh);
+    }
+
+    /* No celular o selo do desktop volta pequeno, apoiado na borda da foto,
+       do lado oposto à primeira linha do título. */
+    .abertura__selo {
+      display: block;
+      position: absolute;
+      z-index: 2;
+      right: var(--margem);
+      bottom: -2.6rem;
+    }
+
+    .abertura__selo :global(.selo) {
+      width: 5.25rem;
+      box-shadow: 0 0 0 0.3rem var(--papel);
+    }
+
+    .abertura__quem {
+      line-height: 1.45;
+    }
+
+    .abertura__acoes {
+      gap: 0.9rem 1.5rem;
+    }
+
+    .abertura__acoes .botao {
+      min-height: 3.25rem;
+      padding: 0.8rem 1.25rem 0.8rem 1.4rem;
+      font-size: 1rem;
     }
   }
 

@@ -71,5 +71,21 @@ const repeticao = [...itens, ...itens];
     color: var(--caramelo);
   }
 
+  @media (max-width: 47.99rem) {
+    .marquee {
+      padding-block: 0.85rem;
+    }
+
+    .marquee__item {
+      gap: 1rem;
+      padding-right: 1rem;
+      font-size: 1.375rem;
+    }
+
+    .marquee__item :global(.marquee__faisca) {
+      width: 0.75rem;
+    }
+  }
+
   /* Sem JavaScript ou com movimento reduzido, a faixa fica parada. */
 </style>

@@ -149,6 +149,16 @@ const ativo = (href: string) => atual === href || atual.startsWith(`${href}/`);
     display: none;
   }
 
+  @media (max-width: 47.99rem) {
+    .cabecalho__linha {
+      min-height: 4rem;
+    }
+
+    .cabecalho :global(.cabecalho__logo) {
+      width: 9.5rem;
+    }
+  }
+
   @media (min-width: 64rem) {
     .cabecalho__linha {
       min-height: 5.75rem;
@@ -327,5 +337,15 @@ const ativo = (href: string) => atual === href || atual.startsWith(`${href}/`);
   .menu-celular__agendar {
     justify-content: center;
     margin-top: 2rem;
+  }
+
+  @media (max-width: 47.99rem) {
+    .menu-celular__topo {
+      min-height: 4rem;
+    }
+
+    .menu-celular__lista a {
+      font-size: 1.625rem;
+    }
   }
 </style>

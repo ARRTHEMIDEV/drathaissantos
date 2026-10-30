@@ -65,7 +65,7 @@ const duvidas = [
 
   .praticas__titulo {
     grid-column: 1 / -1;
-    font-size: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+    font-size: var(--t-secao);
   }
 
   .praticas__lista {
@@ -161,6 +161,26 @@ const duvidas = [
   .duvida__resposta {
     padding-bottom: 1.25rem;
     max-width: 36rem;
+  }
+
+  @media (max-width: 47.99rem) {
+    .praticas__grade {
+      row-gap: 1.75rem;
+    }
+
+    .praticas__item {
+      gap: 0.15rem;
+      padding-block: 0.9rem;
+    }
+
+    .praticas__item dt {
+      font-size: var(--t-auxiliar);
+    }
+
+    .duvida summary {
+      min-height: 3.25rem;
+      font-size: var(--t-pequeno);
+    }
   }
 
   @media (min-width: 64rem) {

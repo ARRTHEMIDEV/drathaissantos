@@ -45,6 +45,30 @@ import Icone from '../Icone.astro';
     color: var(--caramelo-texto);
   }
 
+  @media (max-width: 47.99rem) {
+    .manifesto {
+      padding-block: var(--secao);
+    }
+
+    .manifesto__grade {
+      row-gap: 1.25rem;
+    }
+
+    .manifesto :global(.manifesto__icone) {
+      width: 3rem;
+    }
+
+    .manifesto__texto {
+      font-size: clamp(1.375rem, 1rem + 1.6vw, 1.625rem);
+      line-height: 1.24;
+      letter-spacing: -0.02em;
+    }
+
+    .manifesto__assinatura {
+      font-size: 1.125rem;
+    }
+  }
+
   @media (min-width: 64rem) {
     .manifesto :global(.manifesto__icone) {
       grid-column: 2 / span 2;

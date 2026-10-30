@@ -602,6 +602,35 @@
   color: var(--caramelo);
 }
 
+/* ---------- Celular ---------- */
+
+@media (max-width: 47.99rem) {
+  .artigo__cabecalho {
+    gap: 1.1rem;
+  }
+
+  .artigo__titulo {
+    font-size: var(--t-pagina);
+  }
+
+  .artigo__miolo {
+    row-gap: 2.25rem;
+  }
+
+  .artigo__corpo h2 {
+    margin-top: 2.2em;
+    font-size: 1.3125rem;
+  }
+
+  .fechamento__grade {
+    row-gap: 1.75rem;
+  }
+
+  .fechamento__titulo {
+    font-size: var(--t-secao);
+  }
+}
+
 @media (min-width: 48rem) {
   .fechamento__item {
     grid-column: 1 / span 4;

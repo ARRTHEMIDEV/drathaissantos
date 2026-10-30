@@ -54,4 +54,18 @@ const { titulo, descricao, estrutura, motivo } = Astro.props;
     gap: 0.4rem;
     padding-left: 1.25rem;
   }
+
+  @media (max-width: 47.99rem) {
+    .em-preparo {
+      gap: 1.5rem;
+    }
+
+    .em-preparo__titulo {
+      font-size: var(--t-pagina);
+    }
+
+    .em-preparo__estrutura {
+      padding: 1.1rem 1.25rem;
+    }
+  }
 </style>
