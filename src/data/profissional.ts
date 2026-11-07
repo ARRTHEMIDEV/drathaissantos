@@ -15,8 +15,9 @@ export const profissional = {
   instagramUsuario: '@drathais.bh',
   buscaCfm: 'https://portal.cfm.org.br/busca-medicos/',
 
-  // [PENDENTE] número do WhatsApp do consultório, só dígitos com DDI (ex.: 5531999999999)
-  whatsapp: null as string | null,
+  // WhatsApp do consultório, só dígitos com DDI. Vem do botão "Atendimento" do
+  // Linktree da bio do Instagram (linktr.ee/drathais.bh), lido em 07/11/2026.
+  whatsapp: '5531984916090' as string | null,
   mensagemWhatsapp: 'Olá! Gostaria de informações sobre uma consulta com a Dra. Thaís.',
 
   local: {
